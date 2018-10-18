@@ -25,19 +25,20 @@ let overlay = new sigma({
   }
 })
 
-let deplace = 3600
+let deplace = 360000
 
 let peers = []
 
 const max = 10
-let maxPeers = 2
+let maxPeers = 4
 peers.push(new template({foglet:{
   overlays: [
     {
       name: 'tman',
       options: {
-        delta: 1 * 1000,
+        delta: 2 * 1000,
         maxPeers: maxPeers,
+        timeout: 1 * 1000,
         pendingTimeout: 2 * 1000,
         descriptor:{
           x : 0,
@@ -148,13 +149,16 @@ colorsPromise.then(()=>{
     return new Promise((resolve, reject) => {
       let x = i*2;
       let y = i%5;
+      /* let x = Math.floor(Math.random()*50);
+      let y = Math.floor(Math.random()*50);*/
       let t = new template({foglet:{
         overlays: [
           {
             name: 'tman',
             options: {
               delta: 2 * 1000,
-              pendingTimeout: 3600 * 1000,
+              timeout: 1 * 1000,
+              pendingTimeout: 2 * 1000,
               maxPeers: maxPeers,
               descriptor:{
                 x : x,
@@ -241,7 +245,7 @@ colorsPromise.then(()=>{
       peers.push(t)
       t.connection(p).then(() => {
         rps.refresh()
-        setTimeout(resolve, 500)
+        resolve()
       }).catch(e => {
         reject(e)
       })
@@ -256,13 +260,13 @@ colorsPromise.then(()=>{
     })*/
     overlay.refresh()
 
-      /*setInterval(()=>{
+      setInterval(()=>{
         let x = Math.floor(Math.random()*20)
         let y = Math.floor(Math.random()*20)
-        peers[0].changeLocation(x,y)
-      }, deplace * 1000)*/
+        peers[Math.floor(Math.random()*(max-1)+1)].changeLocation(x,y)
+      }, deplace * 1000)
   
-    setListeners()
+    //setListeners()
     
     
     /*for(let i=0; i<peers.length; i++){
