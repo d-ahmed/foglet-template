@@ -29,7 +29,7 @@ let deplace = 3600
 
 let peers = []
 
-const max = 20
+const max = 10
 let maxPeers = 2
 peers.push(new template({foglet:{
   overlays: [
