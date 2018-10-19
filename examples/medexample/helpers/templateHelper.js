@@ -5,8 +5,10 @@ const updateLocation = peers => {
     const peer = peers[rn];
     const x = Math.floor(Math.random() * (peers.length + 3));
     const y = Math.floor(Math.random() * (peers.length + 3));
-    peer.updateDescriptor({ x, y }, "tman");
-  }, 20 * 1000);
+    const z = Math.floor(Math.random() * (peers.length + 3));
+
+    peer.updateDescriptor({ x, y, z }, "tman");
+  }, 60 * 1000);
 };
 
 // Listeners

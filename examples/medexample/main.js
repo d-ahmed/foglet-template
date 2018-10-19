@@ -1,15 +1,15 @@
 console.log(template); // eslint-disable-line
 // the bundle is included by default in the browser you do not have to require/import it
 localStorage.debug = ""; // 'template'
-const MAX_PEERS = 5;
+const MAX_PEERS = 2;
 // Create sigma graphs _________
 // const rps = createSigma("rps");
 //myChart;
 const overlay = createSigma("overlay");
 // Creating peers and sigma nodes
-const max = 100;
+const max = 10;
 const peers = [];
-const delta = 10 * 1000
+const delta = 2 * 1000
 for (let i = 0; i < max; i++) {
   //  const fogletTemplate = new template(undefined, true);
   const fogletTemplate = new template(
@@ -25,8 +25,8 @@ for (let i = 0; i < max; i++) {
               pendingTimeout: 5 * 1000,
               maxPeers: MAX_PEERS,
               descriptor: {
-                x: Math.floor(Math.random() * max), //   i * 2, // 
-                y:  Math.floor(Math.random() * max), // i % 5 // 
+                x: i * 2, //  Math.floor(Math.random() * max), //   i * 2, // 
+                y:  i % 5, // Math.floor(Math.random() * max), // i % 5 // 
                 z: Math.floor(Math.random() * max)
               }
             }
@@ -36,18 +36,7 @@ for (let i = 0; i < max; i++) {
     },
     true
   );
-  setInterval(() => {
-    const cache = fogletTemplate.foglet.overlay("tman")._network._rps.cache;
-    const neighbours = fogletTemplate.foglet.getNeighbours();
-    neighbours.forEach(neighbour => {
-      let chosen;
-      peers.forEach(peer => {
-        if (peer.foglet.inViewID == neighbour) chosen = peer;
-      });
-      if (!chosen) return;
-      cache.add(neighbour, chosen.foglet.overlay("tman").network.descriptor);
-    });
-  }, 2 * 1000);
+
 
   peers.push(fogletTemplate);
   // Add nodes to graph
@@ -67,6 +56,8 @@ for (let i = 0; i < max; i++) {
     // updateNode(rps, id, descriptor);
     updateNode(overlay, id, descriptor);
   });
+
+  updateLocation(peers);
 }
 
 // Connect random peers with each others
@@ -149,8 +140,8 @@ ranking = (neighbor, callkack) => (a, b) => {
     const dx = xa - xb;
     const dy = ya - yb;
     const dz = za - zb;
-    // return Math.sqrt(dx * dx + dy * dy);
-    return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    return Math.sqrt(dx * dx + dy * dy);
+    // return Math.sqrt(dx * dx + dy * dy + dz * dz);
   };
 
   const distanceA = getDistance(neighbor, a);
@@ -227,9 +218,9 @@ compareNeighbours = (tab1, tab2) => {
 
 doConvergence = () => {
   let cpt = 1;
-  let ranked = getRanked().map(r=>r.map(r1=>r1.id));
   let span = document.getElementById("converge");
   const i = setInterval(()=>{
+    let ranked = getRanked().map(r=>r.map(r1=>r1.id));
     const conv = compareNeighbours(ranked, peersNeighbours());
     span.innerHTML = conv +" %";
     doPlot(cpt,conv)
@@ -238,7 +229,7 @@ doConvergence = () => {
     }
     ++cpt
     span.innerHTML = conv+ '%'
-  }, 1 * 1000)
+  }, 3 * 1000)
 }
 
 let axeY = [0];
