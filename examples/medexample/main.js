@@ -35,19 +35,6 @@ for (let i = 0; i < max; i++) {
     },
     true
   );
-  setInterval(() => {
-    const cache = fogletTemplate.foglet.overlay("tman")._network._rps.cache;
-    const neighbours = fogletTemplate.foglet.getNeighbours();
-    neighbours.forEach(neighbour => {
-      let chosen;
-      peers.forEach(peer => {
-        if (peer.foglet.inViewID == neighbour) chosen = peer;
-      });
-      if (!chosen) return;
-      cache.add(neighbour, chosen.foglet.overlay("tman").network.descriptor);
-    });
-  }, 2 * 1000);
-
   peers.push(fogletTemplate);
   // Add nodes to graph
   const options = {
@@ -78,30 +65,12 @@ forEachPromise(peers, (peer, index) => {
     (resolve, reject) =>
       setTimeout(() => {
         peer.connection(randomPeer).then(resolve);
-      }),
-    index
+      },0.5 *1000),
+
   );
 }).then(() => {
-  // rps.refresh();
-  // overlay.refresh();
-  // console.log("end promise")
-  
-  // Set broadcast listeners
-  // setListeners();
-  // Firing change location loop
-  // updateLocation(peers);
+
 });
-
-
-const i = setInterval(()=>{
-  const conv = convergence();
-  if(conv >=90){
-    clearInterval(i);
-    getCoords()
-  }
-  console.log(conv+ '%')
-}, 1* 1000)
-
 
 let scramble = (delay = 0) => {
   for (let i = 0; i < max; ++i) {
@@ -212,20 +181,6 @@ getCoordsList = function (list) {
   return coords
 }
 
-// setTimeout(()=>{
-//   getCoords()
-//   },10000
-//
-// )
-
-/*const e = setInterval(()=>{
-  const conv = convergence();
-  if(conv===100){
-    clearInterval(e)
-  }
-  console.log('convergence ', conv+ '%')
-}, 3 * 1000)*/
-
 
 ranking = (neighbor, callkack) => (a, b) => {
   const getDistance = (descriptor1, descriptor2) => {
@@ -311,25 +266,27 @@ compareNeighbours = (tab1, tab2) => {
 }
 
 doConvergence = () => {
+  let cpt = 1;
   let ranked = getRanked().map(r=>r.map(r1=>r1.id));
   let span = document.getElementById("converge");
-  let axeY = [0];
-  let axeX = [0];
-  cpt = 0;
-  graph = createGraph();
   const i = setInterval(()=>{
     const conv = compareNeighbours(ranked, peersNeighbours());
-    axeY.push(conv);
-    axeX.push(cpt)
-    updateDatas(axeX,axeY)
+    span.innerHTML = conv +" %";
+    doPlot(cpt,conv)
     if(conv===100){
       clearInterval(i)
     }
-    span.innerHTML = conv+ '%'
-    ++cpt
-    // console.log(conv+ '%')
+    ++cpt;
   }, 3 * 1000)
 }
 
+let axeY = [0];
+let axeX = [0];
+
+doPlot =  (cpt,conv) => {
+  axeY.push(conv)
+  axeX.push(cpt)
+  graph = createGraph(axeX, axeY)
+}
 
 doConvergence();
