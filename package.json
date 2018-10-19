@@ -2,7 +2,7 @@
   "name": "foglet-template",
   "version": "1.0.0",
   "description": "Template using foglet-core module",
-  "main": "index.js",
+  "main": "./lib/index.js",
   "scripts": {
     "lint": "standard --verbose \"./lib/**/*.js\" \"./tests/**/*.js\" | snazzy",
     "fix": "standard --fix --verbose \"./lib/**/*.js\" \"./tests/**/*.js\" | snazzy",
