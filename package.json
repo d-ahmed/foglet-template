@@ -26,11 +26,13 @@
   },
   "homepage": "https://github.com/folkvir/foglet-template#readme",
   "dependencies": {
+    "3d-force-graph": "^1.39.0",
+    "chart.js": "^2.7.3",
     "debug": "^4.0.1",
     "foglet-core": "^5.1.1",
     "lodash.merge": "^4.6.1",
     "sigma": "^1.2.1",
-    "tman-wrtc": "^1.0.0",
+    "tman-wrtc": "git+https://github.com/ran3d/tman-wrtc.git",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
