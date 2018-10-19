@@ -140,8 +140,8 @@ ranking = (neighbor, callkack) => (a, b) => {
     const dx = xa - xb;
     const dy = ya - yb;
     const dz = za - zb;
-    return Math.sqrt(dx * dx + dy * dy);
-    // return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    // return Math.sqrt(dx * dx + dy * dy);
+    return Math.sqrt(dx * dx + dy * dy + dz * dz);
   };
 
   const distanceA = getDistance(neighbor, a);
