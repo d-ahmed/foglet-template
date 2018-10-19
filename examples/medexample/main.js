@@ -1,12 +1,12 @@
 console.log(template); // eslint-disable-line
 // the bundle is included by default in the browser you do not have to require/import it
 localStorage.debug = ""; // 'template'
-const MAX_PEERS = 10;
+const MAX_PEERS = 5;
 // Create sigma graphs _________
 // const rps = createSigma("rps");
 const overlay = createSigma("overlay");
 // Creating peers and sigma nodes
-const max = 50;
+const max = 100;
 const peers = [];
 const delta = 2 * 1000
 for (let i = 0; i < max; i++) {
@@ -24,9 +24,9 @@ for (let i = 0; i < max; i++) {
               pendingTimeout: 5 * 1000,
               maxPeers: MAX_PEERS,
               descriptor: {
-                x: Math.floor(Math.random() * 100), //   i * 2, // 
-                y:  Math.floor(Math.random() * 50), // i % 5 // 
-                z: Math.floor(Math.random() * 50)
+                x: Math.floor(Math.random() * max), //   i * 2, // 
+                y:  Math.floor(Math.random() * max), // i % 5 // 
+                z: Math.floor(Math.random() * max)
               }
             }
           }
@@ -35,18 +35,7 @@ for (let i = 0; i < max; i++) {
     },
     true
   );
-  setInterval(() => {
-    const cache = fogletTemplate.foglet.overlay("tman")._network._rps.cache;
-    const neighbours = fogletTemplate.foglet.getNeighbours();
-    neighbours.forEach(neighbour => {
-      let chosen;
-      peers.forEach(peer => {
-        if (peer.foglet.inViewID == neighbour) chosen = peer;
-      });
-      if (!chosen) return;
-      cache.add(neighbour, chosen.foglet.overlay("tman").network.descriptor);
-    });
-  }, 2 * 1000);
+  
 
   peers.push(fogletTemplate);
   // Add nodes to graph
@@ -78,8 +67,8 @@ forEachPromise(peers, (peer, index) => {
     (resolve, reject) =>
       setTimeout(() => {
         peer.connection(randomPeer).then(resolve);
-      }),
-    index
+      }, 0.5 * 1000),
+    
   );
 }).then(() => {
   // rps.refresh();
@@ -163,8 +152,8 @@ ranking = (neighbor, callkack) => (a, b) => {
     const dx = xa - xb;
     const dy = ya - yb;
     const dz = za - zb;
-    return Math.sqrt(dx * dx + dy * dy);
-    // return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    // return Math.sqrt(dx * dx + dy * dy);
+    return Math.sqrt(dx * dx + dy * dy + dz * dz);
   };
 
   const distanceA = getDistance(neighbor, a);
@@ -250,7 +239,7 @@ doConvergence = () => {
     }
     span.innerHTML = conv+ '%'
     // console.log(conv+ '%')
-  }, 3 * 1000)
+  }, delta * 1000)
 }
 
 
