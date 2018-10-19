@@ -4,11 +4,12 @@ localStorage.debug = ""; // 'template'
 const MAX_PEERS = 5;
 // Create sigma graphs _________
 // const rps = createSigma("rps");
+//myChart;
 const overlay = createSigma("overlay");
 // Creating peers and sigma nodes
 const max = 100;
 const peers = [];
-const delta = 2 * 1000
+const delta = 10 * 1000
 for (let i = 0; i < max; i++) {
   //  const fogletTemplate = new template(undefined, true);
   const fogletTemplate = new template(
@@ -35,7 +36,18 @@ for (let i = 0; i < max; i++) {
     },
     true
   );
-  
+  setInterval(() => {
+    const cache = fogletTemplate.foglet.overlay("tman")._network._rps.cache;
+    const neighbours = fogletTemplate.foglet.getNeighbours();
+    neighbours.forEach(neighbour => {
+      let chosen;
+      peers.forEach(peer => {
+        if (peer.foglet.inViewID == neighbour) chosen = peer;
+      });
+      if (!chosen) return;
+      cache.add(neighbour, chosen.foglet.overlay("tman").network.descriptor);
+    });
+  }, 2 * 1000);
 
   peers.push(fogletTemplate);
   // Add nodes to graph
@@ -67,20 +79,12 @@ forEachPromise(peers, (peer, index) => {
     (resolve, reject) =>
       setTimeout(() => {
         peer.connection(randomPeer).then(resolve);
-      }, 0.5 * 1000),
-    
+      }),
+    index
   );
 }).then(() => {
-  // rps.refresh();
-  // overlay.refresh();
-  // console.log("end promise")
-  
-  // Set broadcast listeners
-  // setListeners();
-  // Firing change location loop
-  // updateLocation(peers);
-});
 
+});
 
 let scramble = (delay = 0) => {
   for (let i = 0; i < max; ++i) {
@@ -136,13 +140,60 @@ var convergence = () => {
 	return (Math.floor(((overlay.graph.edges().length-fails) / (overlay.graph.edges().length))*100 ));
 }
 
-/*const e = setInterval(()=>{
-  const conv = convergence();
-  if(conv===100){
-    clearInterval(e)
+
+ranking = (a) => (b, c) => {
+  const distanceA = (
+    Math.sqrt(
+      Math.pow((a.x - b.x), 2) +
+      Math.pow((a.y - b.y), 2)
+    ))
+  const distanceB = (
+    Math.sqrt(
+      Math.pow((a.x - c.x), 2) +
+      Math.pow((a.y - c.y), 2)
+    ))
+  return distanceA > distanceB ? 1 : distanceA == distanceB ? 0 : -1
+}
+
+
+getCoords = function() {
+  var x = document.getElementById('tbNames')
+  while (x.rows.length > 1) {
+    for (l = 1; l < x.rows.length; ++l) {
+      x.deleteRow(l)
+    }
   }
-  console.log('convergence ', conv+ '%')
-}, 3 * 1000)*/
+  for (let i = 0; i < max; i++) {
+    voisins = JSON.parse(JSON.stringify(overlay.graph.nodes())).sort(ranking(overlay.graph.nodes()[i])).slice(1,MAX_PEERS+1);
+    lesCoords =''
+    cpt = 0;
+    for (let l = 0; l< MAX_PEERS;++l) {
+      for (let m = 0; m < overlay.graph.edges().length; ++m) {
+        if ((overlay.graph.edges()[m].source == overlay.graph.nodes()[i].id) &&
+          (overlay.graph.edges()[m].target ==voisins[l].id)) {
+            lesCoords = lesCoords + '(' + voisins[l].x + ',' + voisins[l].y + ') '
+            ++cpt
+        }
+      }
+    }
+    var x = document.getElementById('tbNames')
+    var row = x.insertRow(i+1)
+    row.insertCell(0).innerHTML =  '(' +overlay.graph.nodes()[i].x +','+overlay.graph.nodes()[i].y+')';
+    row.insertCell(1).innerHTML = lesCoords;
+    row.insertCell(2).innerHTML = getCoordsList(voisins);
+    row.insertCell(3).innerHTML = cpt/MAX_PEERS *100 +"%"
+  }
+
+
+}
+
+getCoordsList = function (list) {
+  coords = ''
+  list.forEach((l) => {
+    coords = coords + '(' + l.x + ',' + l.y + ') '
+  })
+  return coords
+}
 
 
 ranking = (neighbor, callkack) => (a, b) => {
@@ -207,7 +258,7 @@ compareNeighbours = (tab1, tab2) => {
     let differenceA = new Set([...a].filter(x => !b.has(x)));
     let differenceB = new Set([...b].filter(x => !a.has(x)));
     let unionAB = new Set([...differenceA, ...differenceB]);
-    
+
     let contains = false
     let nextIte = iterator.next().value
     if(nextIte){
@@ -216,7 +267,7 @@ compareNeighbours = (tab1, tab2) => {
           if(nextIte.has(id+'-'+id1)){
             contains = true
           }
-        } 
+        }
       }
     }
     let numerateur = b;
@@ -229,18 +280,28 @@ compareNeighbours = (tab1, tab2) => {
 }
 
 doConvergence = () => {
+  let cpt = 1;
   let ranked = getRanked().map(r=>r.map(r1=>r1.id));
   let span = document.getElementById("converge");
-
   const i = setInterval(()=>{
     const conv = compareNeighbours(ranked, peersNeighbours());
+    span.innerHTML = conv +" %";
+    doPlot(cpt,conv)
     if(conv===100){
       clearInterval(i)
     }
     span.innerHTML = conv+ '%'
     // console.log(conv+ '%')
-  }, delta * 1000)
+  }, 3 * 1000)
 }
 
+let axeY = [0];
+let axeX = [0];
+
+doPlot =  (cpt,conv) => {
+  axeY.push(conv)
+  axeX.push(cpt)
+  graph = createGraph(axeX, axeY)
+}
 
 doConvergence();

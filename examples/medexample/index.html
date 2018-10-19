@@ -3,15 +3,16 @@
 
 <head>
   <title>Foglet template</title>
+  <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
   <style type="text/css">
     #rps {
-      max-width: 100%;
+      max-width: 90%;
       height: 10em;
       margin: auto;
     }
 
     #overlay {
-      max-width: 100%;
+      max-width: 90%;
       height: 50em;
       margin: auto;
     }
@@ -28,6 +29,21 @@
   <div><p>Convergence : <span id="converge"></span> </p> </div>
   <div id="overlay"></div>
 
+  <div class="chart-container" style="position: relative; height: 400px; width:900px">
+    <canvas id="myChart" width="800" height="400" style="margin-top: 5px"></canvas>
+  </div>
+
+  <!--<div class="w3-container" style="margin-top:40px">-->
+    <!--<button onclick="getCoords()">Refresh()</button>-->
+    <!--<table class="w3-table-all" id="tbNames">-->
+      <!--<tr>-->
+        <!--<th>Peer</th>-->
+        <!--<th>Actuel</th>-->
+        <!--<th>Theorique</th>-->
+        <!--<th>Score</th>-->
+      <!--</tr>-->
+    <!--</table>-->
+  <!--</div>-->
   <script type='text/javascript' src='../../bin/template.bundle.js'></script>
 
   <!-- Sigma -->
@@ -37,10 +53,20 @@
   <!-- My helpers -->
   <script type='text/javascript' src='./helpers/array.js'></script>
   <script type='text/javascript' src='./helpers/sigmaHelper.js'></script>
+  <script type='text/javascript' src='./helpers/charjsHelper.js'></script>
   <script type='text/javascript' src='./helpers/templateHelper.js'></script>
+
+  <!-- ChartJS -->
+  <script src="../../node_modules/chart.js/dist/Chart.min.js"></script>
 
   <!-- or use the template.bundle.min.js if in prod mode -->
   <script type='text/javascript' src='./main.js'></script>
+
+  <script>
+
+
+
+  </script>
 </body>
 
 </html>

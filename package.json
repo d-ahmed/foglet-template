@@ -26,6 +26,8 @@
   },
   "homepage": "https://github.com/folkvir/foglet-template#readme",
   "dependencies": {
+    "3d-force-graph": "^1.39.0",
+    "chart.js": "^2.7.3",
     "debug": "^4.0.1",
     "foglet-core": "^5.1.1",
     "lodash.merge": "^4.6.1",
