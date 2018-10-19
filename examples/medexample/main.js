@@ -79,8 +79,8 @@ forEachPromise(peers, (peer, index) => {
     (resolve, reject) =>
       setTimeout(() => {
         peer.connection(randomPeer).then(resolve);
-      }),
-    index
+      }, 0.5*1000),
+    
   );
 }).then(() => {
 
@@ -140,60 +140,6 @@ var convergence = () => {
 	return (Math.floor(((overlay.graph.edges().length-fails) / (overlay.graph.edges().length))*100 ));
 }
 
-
-ranking = (a) => (b, c) => {
-  const distanceA = (
-    Math.sqrt(
-      Math.pow((a.x - b.x), 2) +
-      Math.pow((a.y - b.y), 2)
-    ))
-  const distanceB = (
-    Math.sqrt(
-      Math.pow((a.x - c.x), 2) +
-      Math.pow((a.y - c.y), 2)
-    ))
-  return distanceA > distanceB ? 1 : distanceA == distanceB ? 0 : -1
-}
-
-
-getCoords = function() {
-  var x = document.getElementById('tbNames')
-  while (x.rows.length > 1) {
-    for (l = 1; l < x.rows.length; ++l) {
-      x.deleteRow(l)
-    }
-  }
-  for (let i = 0; i < max; i++) {
-    voisins = JSON.parse(JSON.stringify(overlay.graph.nodes())).sort(ranking(overlay.graph.nodes()[i])).slice(1,MAX_PEERS+1);
-    lesCoords =''
-    cpt = 0;
-    for (let l = 0; l< MAX_PEERS;++l) {
-      for (let m = 0; m < overlay.graph.edges().length; ++m) {
-        if ((overlay.graph.edges()[m].source == overlay.graph.nodes()[i].id) &&
-          (overlay.graph.edges()[m].target ==voisins[l].id)) {
-            lesCoords = lesCoords + '(' + voisins[l].x + ',' + voisins[l].y + ') '
-            ++cpt
-        }
-      }
-    }
-    var x = document.getElementById('tbNames')
-    var row = x.insertRow(i+1)
-    row.insertCell(0).innerHTML =  '(' +overlay.graph.nodes()[i].x +','+overlay.graph.nodes()[i].y+')';
-    row.insertCell(1).innerHTML = lesCoords;
-    row.insertCell(2).innerHTML = getCoordsList(voisins);
-    row.insertCell(3).innerHTML = cpt/MAX_PEERS *100 +"%"
-  }
-
-
-}
-
-getCoordsList = function (list) {
-  coords = ''
-  list.forEach((l) => {
-    coords = coords + '(' + l.x + ',' + l.y + ') '
-  })
-  return coords
-}
 
 
 ranking = (neighbor, callkack) => (a, b) => {
@@ -290,9 +236,9 @@ doConvergence = () => {
     if(conv===100){
       clearInterval(i)
     }
+    ++cpt
     span.innerHTML = conv+ '%'
-    // console.log(conv+ '%')
-  }, 3 * 1000)
+  }, 1 * 1000)
 }
 
 let axeY = [0];
