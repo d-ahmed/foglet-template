@@ -62,3 +62,5 @@ typings/
 
 bin/template.bundle.js
 bin/template.bundle.js.map
+
+\.idea/

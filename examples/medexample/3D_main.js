@@ -7,7 +7,7 @@ const MAX_PEERS = 5;
 //myChart;
 //const overlay = createSigma("overlay");
 // Creating peers and sigma nodes
-const max = 100;
+const max = 10;
 const peers = [];
 const delta = 2 * 1000
 for (let i = 0; i < max; i++) {
@@ -21,7 +21,7 @@ for (let i = 0; i < max; i++) {
             name: "tman",
             options: {
               delta: delta,
-              timeout: 2 * 1000,
+              timeout: 60 * 1000,
               pendingTimeout: 5 * 1000,
               maxPeers: MAX_PEERS,
               descriptor: {
