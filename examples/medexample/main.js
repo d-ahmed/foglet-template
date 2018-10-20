@@ -1,13 +1,13 @@
 console.log(template); // eslint-disable-line
 // the bundle is included by default in the browser you do not have to require/import it
 localStorage.debug = ""; // 'template'
-const MAX_PEERS = 2;
+const MAX_PEERS = 5;
 // Create sigma graphs _________
 // const rps = createSigma("rps");
 //myChart;
 const overlay = createSigma("overlay");
 // Creating peers and sigma nodes
-const max = 10;
+const max = 50;
 const peers = [];
 const delta = 2 * 1000
 for (let i = 0; i < max; i++) {
@@ -25,8 +25,8 @@ for (let i = 0; i < max; i++) {
               pendingTimeout: 5 * 1000,
               maxPeers: MAX_PEERS,
               descriptor: {
-                x: i * 2, //  Math.floor(Math.random() * max), //   i * 2, // 
-                y:  i % 5, // Math.floor(Math.random() * max), // i % 5 // 
+                x: Math.floor(Math.random() * max), //   i * 2, // 
+                y:  Math.floor(Math.random() * max),  // i % 5 // 
                 z: Math.floor(Math.random() * max)
               }
             }
@@ -57,7 +57,7 @@ for (let i = 0; i < max; i++) {
     updateNode(overlay, id, descriptor);
   });
 
-  updateLocation(peers);
+  // updateLocation(peers);
 }
 
 // Connect random peers with each others
@@ -133,6 +133,8 @@ var convergence = () => {
 
 
 
+
+
 ranking = (neighbor, callkack) => (a, b) => {
   const getDistance = (descriptor1, descriptor2) => {
     const { x: xa, y: ya, z:za } = descriptor1;
@@ -140,8 +142,8 @@ ranking = (neighbor, callkack) => (a, b) => {
     const dx = xa - xb;
     const dy = ya - yb;
     const dz = za - zb;
-    // return Math.sqrt(dx * dx + dy * dy);
-    return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    return Math.sqrt(dx * dx + dy * dy);
+    // return Math.sqrt(dx * dx + dy * dy + dz * dz);
   };
 
   const distanceA = getDistance(neighbor, a);
@@ -152,6 +154,29 @@ ranking = (neighbor, callkack) => (a, b) => {
   return distanceA - distanceB;
 }
 
+
+peersNeighbours2 = (peers) => {
+  return peers.map( p => ({id: p.foglet.inViewID, neighbours: p.foglet.overlay('tman')._network.getNeighbours()}));
+}
+
+setInterval(()=>{
+  refresh()
+}, 0.5*1000)
+
+refresh = () =>{
+  let peersN = peersNeighbours2(peers)
+  let edges = overlay.graph.edges()
+  edges.forEach(edge=>{
+    dropEdge(overlay, edge.id)
+  })
+  peersN.forEach(peerN => {
+    if(peerN && peerN.neighbours.length>0){
+      peerN.neighbours.forEach(n=>{
+        addEdge(overlay, peerN.id, n)
+      })
+    }
+  })
+}
 
 
 let peersNeighbours = () => peers.map( p => p.foglet.overlay('tman')._network.getNeighbours())
@@ -182,38 +207,38 @@ let getRanked = () => {
 }
 
 compareNeighbours = (tab1, tab2) => {
-  if(tab1.length !== tab2.length){
-    new Error("Require same size")
-    return;
+  if (tab1.length !== tab2.length) {
+    throw new Error('Require same size');
   }
   const reducer = (acc, val) => acc + val;
-  const iterator = equidistance.values()
-  return  Math.floor((tab1.map((value, index)=>{
-    let a = new Set(value);
-    let b = new Set(tab2[index]);
-    let union = new Set([...a, ...b]);
-    let differenceA = new Set([...a].filter(x => !b.has(x)));
-    let differenceB = new Set([...b].filter(x => !a.has(x)));
-    let unionAB = new Set([...differenceA, ...differenceB]);
+  // const iterator = this.equidistance.values();
+  return  Math.floor((tab1.map((value, index) => {
+    const a = new Set(value);
+    const b = new Set(tab2[index].neighbours);
+    const union = new Set([...Array.from(a), ...Array.from(b)]);
+    const differenceA = new Set([...Array.from(a)].filter(x => !b.has(x)));
+    const differenceB = new Set([...Array.from(b)].filter(x => !a.has(x)));
+    const unionAB = new Set([...Array.from(differenceA), ...Array.from(differenceB)]);
 
-    let contains = false
-    let nextIte = iterator.next().value
-    if(nextIte){
-    for (let id of unionAB.values()) {
-        for (let id1 of unionAB.values()) {
-          if(nextIte.has(id+'-'+id1)){
-            contains = true
+
+    let contains = false;
+    const nextIte = equidistance.get(tab2[index].id);
+    // console.log('union', union, 'nextIte', nextIte, 'unionAB', unionAB);
+    if (nextIte) {
+    for (const id of Array.from(unionAB)) {
+        for (const id1 of Array.from(unionAB)) {
+          if (nextIte.has(id + '-' + id1)) {
+            contains = true;
           }
         }
       }
     }
     let numerateur = b;
-    if(contains && b.size !== union.size){
-      numerateur = new Set([...b, ...unionAB]);
+    if (contains && b.size > 0 && b.size !== union.size) {
+      numerateur = new Set([...Array.from(b), ...Array.from(unionAB)]);
     }
-    // console.log(index, contains, a.size !== union.size)
-    return (numerateur.size/union.size)
-  }).reduce(reducer)/ tab1.length)* 100)
+    return (numerateur.size / union.size);
+  }).reduce(reducer) / tab1.length) * 100);
 }
 
 doConvergence = () => {
@@ -221,7 +246,8 @@ doConvergence = () => {
   let span = document.getElementById("converge");
   const i = setInterval(()=>{
     let ranked = getRanked().map(r=>r.map(r1=>r1.id));
-    const conv = compareNeighbours(ranked, peersNeighbours());
+    // const conv = compareNeighbours(ranked, peersNeighbours());
+    const conv = this.compareNeighbours(ranked, this.peersNeighbours2(peers));
     span.innerHTML = conv +" %";
     doPlot(cpt,conv)
     if(conv===100){
