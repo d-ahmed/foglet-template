@@ -1,7 +1,7 @@
 console.log(template); // eslint-disable-line
 // the bundle is included by default in the browser you do not have to require/import it
 localStorage.debug = ""; // 'template'
-const MAX_PEERS = 5;
+const MAX_PEERS = 1;
 // Create sigma graphs _________
 // const rps = createSigma("rps");
 //myChart;
