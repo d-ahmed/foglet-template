@@ -7,7 +7,10 @@ const elem = document.getElementById("3d-graph");
 const Graph = ForceGraph3D()(elem)
   .enableNodeDrag(false)
   .onNodeHover(node => elem.style.cursor = node ? 'pointer' : null)
-  .graphData(initData);
+  .graphData(initData)
+  .linkDirectionalArrowLength(3.5)
+  .linkDirectionalArrowRelPos(1)
+  .linkCurvature(0.25);
 
 function removeNode(node) {
   let { nodes, links } = Graph.graphData();
