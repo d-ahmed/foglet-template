@@ -25,8 +25,8 @@ for (let i = 0; i < max; i++) {
               pendingTimeout: 5 * 1000,
               maxPeers: MAX_PEERS,
               descriptor: {
-                x: Math.floor(Math.random() * max), //   i * 2, // 
-                y:  Math.floor(Math.random() * max),  // i % 5 // 
+                x: i * 2, // Math.floor(Math.random() * max), //
+                y:  i % 5, //  Math.floor(Math.random() * max),  // 
                 z: Math.floor(Math.random() * max)
               }
             }
