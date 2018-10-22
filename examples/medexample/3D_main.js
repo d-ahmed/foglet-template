@@ -1,6 +1,6 @@
 
 const MAX_PEERS = 2
-const max = 10
+const max = 30
 const peers = []
 const delta = 1000
 for (let i = 0; i < max; i++) {

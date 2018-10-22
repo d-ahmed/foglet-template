@@ -25,8 +25,8 @@ for (let i = 0; i < max; i++) {
               pendingTimeout: 5 * 1000,
               maxPeers: MAX_PEERS,
               descriptor: {
-                x: i * 2, // Math.floor(Math.random() * max), //
-                y:  i % 5, //  Math.floor(Math.random() * max),  // 
+                x: i * 2, // Math.floor(Math.random() * max), // 
+                y:  i % 5, //  Math.floor(Math.random() * max),  //  
                 z: Math.floor(Math.random() * max)
               }
             }
@@ -49,9 +49,9 @@ for (let i = 0; i < max; i++) {
   // Adding listeners
   const fgId = fogletTemplate.foglet.inViewID;
   // fogletTemplate.on("rps-open", id => addEdge(rps, fgId, id));
-  fogletTemplate.on("overlay-open", id => addEdge(overlay, fgId, id));
+  //fogletTemplate.on("overlay-open", id => addEdge(overlay, fgId, id));
   // fogletTemplate.on("rps-close", id => dropEdge(rps, `${fgId}-${id}`));
-  fogletTemplate.on("overlay-close", id => dropEdge(overlay, `${fgId}-${id}`));
+  //fogletTemplate.on("overlay-close", id => dropEdge(overlay, `${fgId}-${id}`));
   fogletTemplate.on("descriptor-updated", ({ id, descriptor }) => {
     // updateNode(rps, id, descriptor);
     updateNode(overlay, id, descriptor);
@@ -60,8 +60,8 @@ for (let i = 0; i < max; i++) {
   // updateLocation(peers);
 }
 
-// Connect random peers with each others
-forEachPromise(peers, (peer, index) => {
+
+Array.from(peers, (peer, index) => {
   if (index == 0) return;
   let rn = index;
   rn = Math.floor(Math.random() * index);
@@ -70,12 +70,12 @@ forEachPromise(peers, (peer, index) => {
     (resolve, reject) =>
       setTimeout(() => {
         peer.connection(randomPeer).then(resolve);
-      }, 0.5*1000),
-    
+      }, index*0.5*1000),
   );
-}).then(() => {
+})
 
-});
+// Connect random peers with each others
+
 
 let scramble = (delay = 0) => {
   for (let i = 0; i < max; ++i) {
@@ -148,8 +148,15 @@ ranking = (neighbor, callkack) => (a, b) => {
 
   const distanceA = getDistance(neighbor, a);
   const distanceB = getDistance(neighbor, b);
-  if(distanceA === distanceB){
+  /*if(distanceA === distanceB){
     callkack(neighbor, a, b)
+  }*/
+  if(distanceA === distanceB){
+    if(a.x>=b.x){
+      return -1;
+    }else  if(a.x<b.x){
+      return 1;
+    }
   }
   return distanceA - distanceB;
 }
@@ -177,7 +184,6 @@ refresh = () =>{
     }
   })
 }
-
 
 let peersNeighbours = () => peers.map( p => p.foglet.overlay('tman')._network.getNeighbours())
 
@@ -241,13 +247,29 @@ compareNeighbours = (tab1, tab2) => {
   }).reduce(reducer) / tab1.length) * 100);
 }
 
+
+compareNeighbours2 = (tab1, tab2) => {
+  if (tab1.length !== tab2.length) {
+    throw new Error('Require same size');
+  }
+  const reducer = (acc, val) => acc + val;
+  return Math.floor((tab1.map((value, index)=>{
+    let nbEq = 0;
+    value.length>0 && value.forEach(neighbor=>{
+      if(tab2[index].length>0 && tab2[index].indexOf(neighbor)!==-1) nbEq++
+    })
+    return nbEq/value.length
+  }).reduce(reducer) / tab1.length) * 100)
+}
+
 doConvergence = () => {
   let cpt = 1;
   let span = document.getElementById("converge");
+  let ranked = getRanked().map(r=>r.map(r1=>r1.id));
   const i = setInterval(()=>{
-    let ranked = getRanked().map(r=>r.map(r1=>r1.id));
+    
     // const conv = compareNeighbours(ranked, peersNeighbours());
-    const conv = this.compareNeighbours(ranked, this.peersNeighbours2(peers));
+    const conv = this.compareNeighbours2(ranked, peersNeighbours());
     span.innerHTML = conv +" %";
     doPlot(cpt,conv)
     if(conv===100){
@@ -255,7 +277,7 @@ doConvergence = () => {
     }
     ++cpt
     span.innerHTML = conv+ '%'
-  }, 3 * 1000)
+  }, 1 * 1000)
 }
 
 let axeY = [0];
