@@ -1,13 +1,13 @@
 console.log(template); // eslint-disable-line
 // the bundle is included by default in the browser you do not have to require/import it
 localStorage.debug = ""; // 'template'
-const MAX_PEERS = 2;
+const MAX_PEERS = 0;
 // Create sigma graphs _________
 // const rps = createSigma("rps");
 //myChart;
 const overlay = createSigma("overlay");
 // Creating peers and sigma nodes
-const max = 10;
+const max = 20;
 const peers = [];
 const delta = 2 * 1000
 for (let i = 0; i < max; i++) {
@@ -25,9 +25,11 @@ for (let i = 0; i < max; i++) {
               pendingTimeout: 5 * 1000,
               maxPeers: MAX_PEERS,
               descriptor: {
-                x: i * 2, // Math.floor(Math.random() * max), // 
-                y:  i % 5, //  Math.floor(Math.random() * max),  //  
-                z: Math.floor(Math.random() * max)
+                iscible: i%8===0 ? true : false,
+                x: Math.floor(Math.random() * max), //  i * 2, // 
+                y:  Math.floor(Math.random() * max),  //  i % 5, //  
+                z: Math.floor(Math.random() * max),
+                perimettre: Math.floor(Math.random() * 10 + 2) // 2 //
               }
             }
           }
