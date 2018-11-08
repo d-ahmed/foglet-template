@@ -25,11 +25,11 @@ for (let i = 0; i < max; i++) {
               pendingTimeout: 5 * 1000,
               maxPeers: MAX_PEERS,
               descriptor: {
-                iscible: i%8===0 ? true : false,
-                x: Math.floor(Math.random() * max), //  i * 2, // 
-                y:  Math.floor(Math.random() * max),  //  i % 5, //  
+                // iscible: i%8===0 ? true : false,
+                x:   i * 2, // Math.floor(Math.random() * max), //
+                y:    i % 5, //  Math.floor(Math.random() * max),  //
                 z: Math.floor(Math.random() * max),
-                perimettre: Math.floor(Math.random() * 10 + 2) // 2 //
+                // perimettre: Math.floor(Math.random() * 10 + 2) // 2 //
               }
             }
           }
@@ -292,3 +292,25 @@ doPlot =  (cpt,conv) => {
 }
 
 doConvergence();
+
+let idCible =0;
+
+addCible = (x, y, perimettre)=>{
+  const id = 'C-' + idCible
+  peers.forEach(peer=>{
+    peer.foglet.overlay('tman')._network.addCible({
+      id: id,
+      x:x,
+      y:y,
+      perimettre:perimettre
+    })
+  })
+  ++idCible
+}
+
+
+removeCible = (id)=>{
+  peers.forEach(peer=>{
+    peer.foglet.overlay('tman')._network.removeCible(id)
+  })  
+}
