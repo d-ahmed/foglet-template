@@ -297,14 +297,23 @@ let idCible =0;
 
 addCible = (x, y, perimettre)=>{
   const id = 'C-' + idCible
+  const cible = {
+    id: id,
+    x:x,
+    y:y,
+    perimettre:perimettre
+  }
   peers.forEach(peer=>{
-    peer.foglet.overlay('tman')._network.addCible({
-      id: id,
-      x:x,
-      y:y,
-      perimettre:perimettre
-    })
+    peer.foglet.overlay('tman')._network.addCible(cible)
   })
+  overlay.graph.addNode({
+    id: cible.id,
+    label: cible.id,
+    x: cible.x,
+    y: cible.y,
+    size: 5,
+    color: randomColor()
+  });
   ++idCible
 }
 
@@ -312,5 +321,6 @@ addCible = (x, y, perimettre)=>{
 removeCible = (id)=>{
   peers.forEach(peer=>{
     peer.foglet.overlay('tman')._network.removeCible(id)
-  })  
+  }) 
+  overlay.graph.dropNode(id)
 }
