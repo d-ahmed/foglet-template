@@ -26,8 +26,8 @@ for (let i = 0; i < max; i++) {
               maxPeers: MAX_PEERS,
               descriptor: {
                 // iscible: i%8===0 ? true : false,
-                x:   i * 2, // Math.floor(Math.random() * max), //
-                y:    i % 5, //  Math.floor(Math.random() * max),  //
+                x:   Math.floor(Math.random() * max), //i * 2, // 
+                y:    Math.floor(Math.random() * max),  //i % 5, //  
                 z: Math.floor(Math.random() * max),
                 // perimettre: Math.floor(Math.random() * 10 + 2) // 2 //
               }
