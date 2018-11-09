@@ -51,12 +51,13 @@ for (let i = 0; i < max; i++) {
   // Adding listeners
   const fgId = fogletTemplate.foglet.inViewID;
   // fogletTemplate.on("rps-open", id => addEdge(rps, fgId, id));
-  //fogletTemplate.on("overlay-open", id => addEdge(overlay, fgId, id));
-  // fogletTemplate.on("rps-close", id => dropEdge(rps, `${fgId}-${id}`));
-  //fogletTemplate.on("overlay-close", id => dropEdge(overlay, `${fgId}-${id}`));
+  fogletTemplate.on("overlay-open", id => electLeader());
+  //fogletTemplate.on("rps-close", id => electLeader());
+  fogletTemplate.on("overlay-close", id => electLeader());
   fogletTemplate.on("descriptor-updated", ({ id, descriptor }) => {
     // updateNode(rps, id, descriptor);
     updateNode(overlay, id, descriptor);
+    electLeader();
   });
 
   // updateLocation(peers);
@@ -324,3 +325,46 @@ removeCible = (id)=>{
   }) 
   overlay.graph.dropNode(id)
 }
+
+
+getDistance = (descriptor1, descriptor2) => {
+  const { x: xa, y: ya, z:za } = descriptor1;
+  const { x: xb, y: yb, z:zb } = descriptor2;
+  const dx = xa - xb;
+  const dy = ya - yb;
+  const dz = za - zb;
+  return Math.sqrt(dx * dx + dy * dy);
+  //return Math.sqrt(dx * dx + dy * dy + dz * dz);
+}
+
+electLeader = ()=> {
+  peers.forEach((peer1) => {
+
+    peer1.foglet.overlay("tman").network.descriptor.leaders = [];
+    peer1.foglet.overlay("tman").network.descriptor.cibles.forEach((cible) => {
+      peer1.foglet.overlay("tman").network.descriptor.leaders.push(true); //console.log("t");
+    });
+
+    peers.forEach((peer) => {
+
+      peer1.foglet.overlay("tman").network.descriptor.cibles.forEach((maCible) => {
+
+        peer.foglet.overlay("tman").network.descriptor.cibles.forEach((saCible) => {
+          peer.foglet.overlay("tman").network.cibles.forEach((cible) => {
+            if(cible.id == maCible && cible.id == saCible){
+              if(getDistance(cible, peer1.foglet.overlay("tman").network.descriptor) > 
+              getDistance(cible, peer.foglet.overlay("tman").network.descriptor)){
+                peer1.foglet.overlay("tman")
+                .network.descriptor.leaders[peer1.foglet.overlay("tman")
+                .network.descriptor.cibles.indexOf(maCible)] = false;
+              }
+
+            }
+          })
+
+
+        })
+      })
+    })
+  })}
+  electLeader();
