@@ -357,7 +357,19 @@ electLeader = ()=> {
                 peer1.foglet.overlay("tman")
                 .network.descriptor.leaders[peer1.foglet.overlay("tman")
                 .network.descriptor.cibles.indexOf(maCible)] = false;
-              }
+              } else if(getDistance(cible, peer1.foglet.overlay("tman").network.descriptor) == 
+              getDistance(cible, peer.foglet.overlay("tman").network.descriptor)){
+
+                if (parseFloat(peer1.foglet.overlay("tman").network.descriptor.id) > 
+                parseFloat(peer.foglet.overlay("tman").network.descriptor.id)){
+
+                  peer1.foglet.overlay("tman")
+                  .network.descriptor.leaders[peer1.foglet.overlay("tman")
+                  .network.descriptor.cibles.indexOf(maCible)] = false;
+
+                }
+
+              } 
 
             }
           })
