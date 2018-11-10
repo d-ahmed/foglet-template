@@ -7,7 +7,7 @@ const MAX_PEERS = 0;
 //myChart;
 const overlay = createSigma("overlay");
 // Creating peers and sigma nodes
-const max = 20;
+const max = 100;
 const peers = [];
 const delta = 2 * 1000
 for (let i = 0; i < max; i++) {
