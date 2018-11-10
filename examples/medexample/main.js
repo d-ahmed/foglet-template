@@ -25,11 +25,10 @@ for (let i = 0; i < max; i++) {
               pendingTimeout: 5 * 1000,
               maxPeers: MAX_PEERS,
               descriptor: {
-                // iscible: i%8===0 ? true : false,
+                cibles:[],
                 x:   Math.floor(Math.random() * max), //i * 2, // 
-                y:    Math.floor(Math.random() * max),  //i % 5, //  
+                y:    Math.floor(Math.random() * max), //  i % 5, //  
                 z: Math.floor(Math.random() * max),
-                // perimettre: Math.floor(Math.random() * 10 + 2) // 2 //
               }
             }
           }
@@ -51,13 +50,13 @@ for (let i = 0; i < max; i++) {
   // Adding listeners
   const fgId = fogletTemplate.foglet.inViewID;
   // fogletTemplate.on("rps-open", id => addEdge(rps, fgId, id));
-  fogletTemplate.on("overlay-open", id => electLeader());
+  //fogletTemplate.on("overlay-open", id => electLeader());
   //fogletTemplate.on("rps-close", id => electLeader());
-  fogletTemplate.on("overlay-close", id => electLeader());
+  //fogletTemplate.on("overlay-close", id => electLeader());
   fogletTemplate.on("descriptor-updated", ({ id, descriptor }) => {
     // updateNode(rps, id, descriptor);
     updateNode(overlay, id, descriptor);
-    electLeader();
+    //electLeader();
   });
 
   // updateLocation(peers);
