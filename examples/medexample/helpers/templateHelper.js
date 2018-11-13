@@ -59,3 +59,24 @@ function setListeners() {
     });
   });
 }
+
+const peersNeighbours2 = peers => {
+  return peers.map(p => ({
+    id: p.foglet.inViewID,
+    neighbours: p.foglet.overlay("tman")._network.getNeighbours()
+  }));
+};
+const refresh = () => {
+  let peersN = peersNeighbours2(peers);
+  let edges = overlay.graph.edges();
+  edges.forEach(edge => {
+    dropEdge(overlay, edge.id);
+  });
+  peersN.forEach(peerN => {
+    if (peerN && peerN.neighbours.length > 0) {
+      peerN.neighbours.forEach(n => {
+        addEdge(overlay, peerN.id, n);
+      });
+    }
+  });
+};

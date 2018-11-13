@@ -13,11 +13,16 @@ const createSigma = (container, settings = {}) => {
   });
 };
 
+const addNode = (container, options) => {
+  container.graph.addNode(options);
+  container.refresh();
+};
+
 const addTemplateToGraph = (container, template, options) => {
   const { index, color } = options;
   const { x, y } = template.foglet.overlay("tman").network.descriptor;
   const id = template.foglet.inViewID;
-  container.graph.addNode({
+  addNode(container, {
     id,
     label: `${id.substring(0, 4)}(${x},${y})`,
     x,
@@ -25,21 +30,26 @@ const addTemplateToGraph = (container, template, options) => {
     size: 3,
     color
   });
+  container.refresh();
 };
 
 const addEdge = (container, source, target) => {
-  let exists = false;
-  container.graph.edges().forEach(edge => {
-    if (edge.id == source + "-" + target) exists = true;
-  });
-  if (exists) return;
-  container.graph.addEdge({
-    id: source + "-" + target,
-    source,
-    target,
-    type: "curvedArrow"
-  });
-  container.refresh();
+  try {
+    let exists = false;
+    container.graph.edges().forEach(edge => {
+      if (edge.id == source + "-" + target) exists = true;
+    });
+    if (exists) return;
+    container.graph.addEdge({
+      id: source + "-" + target,
+      source,
+      target,
+      type: "curvedArrow"
+    });
+    container.refresh();
+  } catch (e) {
+    console.log("error connecting edges", e);
+  }
 };
 
 const dropEdge = (container, id) => {
