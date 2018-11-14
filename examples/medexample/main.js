@@ -1,13 +1,13 @@
 const { template, target } = consensus; // eslint-disable-line
 // the bundle is included by default in the browser you do not have to require/import it
 localStorage.debug = ""; // 'template'
-const MAX_PEERS = 2;
+const MAX_PEERS = 10;
 // Create sigma graphs _________
 // const rps = createSigma("rps");
 //myChart;
 const overlay = createSigma("overlay");
 // Creating peers and sigma nodes
-const max = 200;
+const max = 100;
 const peers = [];
 const delta = 2 * 1000;
 for (let i = 0; i < max; i++) {
@@ -30,6 +30,8 @@ for (let i = 0; i < max; i++) {
                 x: Math.floor(Math.random() * max), // i * 2, // 
                 y: Math.floor(Math.random() * max), // i % 5, 
                 z: Math.floor(Math.random() * max)
+                //  x: i,
+                //  y: i % 3
               }
             }
           }
@@ -42,7 +44,7 @@ for (let i = 0; i < max; i++) {
   peers.push(fogletTemplate);
   // Add nodes *to graph
   const options = {
-    color: randomColor(),
+    color: "#000", //randomColor(), ,
     index: i
   };
   // addTemplateToGraph(rps, fogletTemplate, options);
