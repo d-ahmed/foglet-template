@@ -385,8 +385,10 @@ module.exports = class Overlay extends TMAN {
   }
 
   _updateCache(delay = this.options.delta) {
-    const overlay = this.options.pid;
+    
+    
     this.periodic = setInterval(() => {
+      const overlay = this.options.pid;
       this._rps.parent.getPeers().forEach(peerId => {
         this._manager
           .overlay(overlay)
@@ -394,11 +396,16 @@ module.exports = class Overlay extends TMAN {
             peerId,
             new MUpdateCache(this.inviewId, this._rps.options.descriptor)
           );
+          if(this.options.descriptor.id==="1"){
+            //console.log(this.options, this._rps.options)
+          }
+          
       });
-
+      
       this._rps.parent.getPeers().forEach(peerId => {
         this._manager.overlay(overlay).communication.sendUnicast(peerId, new MUpdatePartialView(this.inviewId, this._rps.options.descriptor))
       });
+
     }, 2 * 1000);
   }
 
@@ -459,6 +466,7 @@ module.exports = class Overlay extends TMAN {
 
 const MUpdateCache = __webpack_require__(/*! ./messages/mupdatecache.js */ "./lib/overlay/messages/mupdatecache.js");
 const TMAN = __webpack_require__(/*! ./overlay */ "./lib/overlay/overlay.js");
+const MUpdatePartialView = __webpack_require__(/*! ./messages/mupdatepartialview.js */ "./lib/overlay/messages/mupdatepartialview.js");
 
 
 module.exports = class Perimeter extends TMAN {
@@ -474,9 +482,10 @@ module.exports = class Perimeter extends TMAN {
 
   _updateLeader(delay = this.options.delta) {
     setInterval(() => {
-     
       const overlay = this.options.pid;
       const manager = this._manager.overlay(overlay);
+
+      
       const neighbours = manager._network.getNeighbours();
       neighbours.forEach(neighbour => {
         const {
@@ -517,7 +526,7 @@ module.exports = class Perimeter extends TMAN {
 
   _updateCache(delay = this.options.delta) {
     const overlay = this.options.pid;
-    this.periodic = setInterval(() => {
+    setInterval(() => {
         this._manager
         .overlay(overlay)
         ._network.getNeighbours()
@@ -530,10 +539,11 @@ module.exports = class Perimeter extends TMAN {
             );
         });
 
-      /*this._rps.parent.getPeers().forEach(peerId => {
-          this._manager.overlay('tman').communication.sendUnicast(peerId, new MUpdatePartialView(this.inviewId, this._rps.options.descriptor))
-        });*/
-      // this._rps.parent.getPeers().forEach(
+        this._manager
+        .overlay(overlay)
+        ._network.getNeighbours().forEach(peerId => {
+          this._manager.overlay(overlay).communication.sendUnicast(peerId, new MUpdatePartialView(this.inviewId, this._rps.options.descriptor))
+        });
     }, 2 * 1000);
   }
 
@@ -567,6 +577,8 @@ module.exports = class Perimeter extends TMAN {
     const { coordinates, perimeter } = this.options.target;
     return this.isNearby(coordinates, descriptorA, perimeter) ? -1 : 1;
   }
+
+  
 };
 
 
@@ -826,20 +838,22 @@ class Template extends EventEmitter {
   }
 
   updateDescriptor(descriptor, overlay = "tman") {
-    const myDescriptor = this.foglet.overlay(overlay).network.descriptor;
+    
+    const myDescriptor = this.foglet.overlay(overlay).network.descriptor = this.foglet.overlay(overlay).network.options.descriptor;
+
+    myDescriptor.x = descriptor.x;
+    myDescriptor.y = descriptor.y;
+    myDescriptor.z = descriptor.z;
+
     this.foglet
       .overlay(overlay)
       .network._rps.parent.getPeers()
       .forEach(peerId => {
         this.sendOverlayUnicast(
           peerId,
-          new MUpdatePartialView(this.foglet.inViewID, descriptor)
+          new MUpdatePartialView(this.foglet.inViewID, myDescriptor)
         );
       });
-
-    myDescriptor.x = descriptor.x;
-    myDescriptor.y = descriptor.y;
-    myDescriptor.z = descriptor.z;
     
     this.emit("descriptor-updated", { id: this.foglet.inViewID, descriptor: myDescriptor });
   }

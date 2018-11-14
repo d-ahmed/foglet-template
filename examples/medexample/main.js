@@ -7,7 +7,7 @@ const MAX_PEERS = 10;
 //myChart;
 const overlay = createSigma("overlay");
 // Creating peers and sigma nodes
-const max = 200;
+const max = 30;
 const peers = [];
 const delta = 2 * 1000;
 for (let i = 0; i < max; i++) {
@@ -27,8 +27,8 @@ for (let i = 0; i < max; i++) {
               maxPeers: MAX_PEERS,
               descriptor: {
                 id: i + "",
-                x: Math.floor(Math.random() * max), // i * 2, // 
-                y: Math.floor(Math.random() * max), // i % 5, 
+                x: i * 2, // Math.floor(Math.random() * max), // 
+                y: i % 5,  // Math.floor(Math.random() * max), // 
                 z: Math.floor(Math.random() * max)
                 //  x: i,
                 //  y: i % 3
@@ -77,10 +77,10 @@ Array.from(peers, (peer, index) => {
 });
 
 // spawnTarget(30);
-spawnTarget(1, { coordinates: { x: 100, y: 100 }, perimeter: 20 });
-spawnTarget(2, { coordinates: { x: 100, y: 50 }, perimeter: 20 });
+spawnTarget(1, { coordinates: { x: 0, y: 0 }, perimeter: 20 });
+/*spawnTarget(2, { coordinates: { x: 100, y: 50 }, perimeter: 20 });
 spawnTarget(3, { coordinates: { x: 150, y: 130 }, perimeter: 30 });
-spawnTarget(4, { coordinates: { x: 50, y: 130 }, perimeter: 20 });
+spawnTarget(4, { coordinates: { x: 50, y: 130 }, perimeter: 20 });*/
 
 // setInterval(() => {
 //   refresh();
