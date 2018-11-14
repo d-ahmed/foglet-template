@@ -396,9 +396,9 @@ module.exports = class Overlay extends TMAN {
           );
       });
 
-      /*this._rps.parent.getPeers().forEach(peerId => {
-        this._manager.overlay('tman').communication.sendUnicast(peerId, new MUpdatePartialView(this.inviewId, this._rps.options.descriptor))
-      });*/
+      this._rps.parent.getPeers().forEach(peerId => {
+        this._manager.overlay(overlay).communication.sendUnicast(peerId, new MUpdatePartialView(this.inviewId, this._rps.options.descriptor))
+      });
     }, 2 * 1000);
   }
 
@@ -767,8 +767,8 @@ class Template extends EventEmitter {
     this.targets = [];
     debug("Template initialized.");
 
-    this.on('descriptor-updated', (id, myDescriptor) => {
-        // Updating my target overlays
+    this.on('descriptor-updated', (descriptor) => {
+      const myDescriptor = descriptor.descriptor
       this.targets.forEach(target => {
         // 1. check if target withing my perimeter
         if (target.isNearby(myDescriptor)) {
@@ -841,7 +841,7 @@ class Template extends EventEmitter {
     myDescriptor.y = descriptor.y;
     myDescriptor.z = descriptor.z;
     
-    this.emit("descriptor-updated", { id: this.foglet.inViewID, descriptor });
+    this.emit("descriptor-updated", { id: this.foglet.inViewID, descriptor: myDescriptor });
   }
 
   buildOverlay(overlay) {
