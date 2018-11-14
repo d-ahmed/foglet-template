@@ -27,8 +27,8 @@ for (let i = 0; i < max; i++) {
               maxPeers: MAX_PEERS,
               descriptor: {
                 id: i + "",
-                x: Math.floor(Math.random() * max), //
-                y: Math.floor(Math.random() * max), //
+                x: Math.floor(Math.random() * max), // i * 2, // 
+                y: Math.floor(Math.random() * max), // i % 5, 
                 z: Math.floor(Math.random() * max)
               }
             }
@@ -70,12 +70,15 @@ Array.from(peers, (peer, index) => {
   return new Promise((resolve, reject) =>
     setTimeout(() => {
       peer.connection(randomPeer).then(resolve);
-    }, index * 0.5 * 1000)
+    }, index * 1000)
   );
 });
 
-spawnTarget(30);
-spawnTarget(2, { coordinates: { x: 20, y: 20 }, perimeter: 40 });
+// spawnTarget(30);
+spawnTarget(1, { coordinates: { x: 100, y: 100 }, perimeter: 20 });
+spawnTarget(2, { coordinates: { x: 100, y: 50 }, perimeter: 20 });
+spawnTarget(3, { coordinates: { x: 150, y: 130 }, perimeter: 30 });
+spawnTarget(4, { coordinates: { x: 50, y: 130 }, perimeter: 20 });
 
 // setInterval(() => {
 //   refresh();

@@ -8,7 +8,7 @@ const spawnTarget = (id, options = {}) => {
     label: `${spawned.id}`,
     x,
     y,
-    size: 2,
+    size: 4,
     color: "#000"
   });
   // Add peers to the target overlay
@@ -17,6 +17,9 @@ const spawnTarget = (id, options = {}) => {
     if (!response) return;
     const fgid = peer.foglet.inViewID;
     peer.on(spawned.id + "-open", id => addEdge(overlay, fgid, id));
-    peer.on(spawned.id + "-close", id => dropEdge(overlay, `${fgid}-${id}`));
+    peer.on(spawned.id + "-close", id => {
+      dropEdge(overlay, `${fgid}-${id}`);
+      // console.log(spawned.id + "-close");
+    });
   });
 };
