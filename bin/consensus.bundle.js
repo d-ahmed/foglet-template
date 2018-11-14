@@ -473,7 +473,8 @@ module.exports = class Perimeter extends TMAN {
   }
 
   _updateLeader(delay = this.options.delta) {
-    this.periodic = setInterval(() => {
+    setInterval(() => {
+     
       const overlay = this.options.pid;
       const manager = this._manager.overlay(overlay);
       const neighbours = manager._network.getNeighbours();
@@ -487,10 +488,9 @@ module.exports = class Perimeter extends TMAN {
         const neighbourPos = this._rps.partialView.get(neighbour).descriptor;
         const distance1 = this.getDistance(leaderPos, targetPos);
         const distance2 = this.getDistance(neighbourPos, targetPos);
-
         if (
-          distance2 < distance1 ||
-          (distance2 == distance1 && neighbour < leaderId)
+          (distance2 < distance1) ||
+          (distance2 === distance1 && neighbour < leaderId)
         ) {
           this.options.target.leader = {
             id: neighbour,
@@ -518,7 +518,7 @@ module.exports = class Perimeter extends TMAN {
   _updateCache(delay = this.options.delta) {
     const overlay = this.options.pid;
     this.periodic = setInterval(() => {
-      const neighbours = this._manager
+        this._manager
         .overlay(overlay)
         ._network.getNeighbours()
         .forEach(peerId => {
@@ -545,6 +545,7 @@ module.exports = class Perimeter extends TMAN {
     const dz = za - zb;
     return Math.sqrt(dx * dx + dy * dy);
   }
+
   isNearby(descriptor1, descriptor2, perimeter) {
     const distance = this.getDistance(descriptor1, descriptor2);
     //  Math.sqrt(dx * dx + dy * dy + dz * dz);
@@ -579,6 +580,7 @@ module.exports = class Perimeter extends TMAN {
 /***/ (function(module, exports, __webpack_require__) {
 
 const Perimeter = __webpack_require__(/*! ./overlay/perimeter.js */ "./lib/overlay/perimeter.js");
+const lmerge = __webpack_require__(/*! lodash.merge */ "./node_modules/lodash.merge/index.js")
 
 module.exports = class Target {
   constructor(id, options) {
@@ -592,7 +594,7 @@ module.exports = class Target {
       z: Math.floor(Math.random() * 20)
     };
 
-    this.options = Object.assign(
+    this.options = lmerge(
       {
         coordinates,
         perimeter,
@@ -764,6 +766,29 @@ class Template extends EventEmitter {
 
     this.targets = [];
     debug("Template initialized.");
+
+    this.on('descriptor-updated', (id, myDescriptor) => {
+        // Updating my target overlays
+      this.targets.forEach(target => {
+        // 1. check if target withing my perimeter
+        if (target.isNearby(myDescriptor)) {
+          // 2. if within, check if i already have it
+          if (this.foglet.overlay(target.id)) return;
+          this.buildOverlay(
+            lmerge(target.getOverlay(), {
+              options: {
+                descriptor: myDescriptor
+              }
+            })
+          );
+        } else {
+          if (this.foglet.overlay(target.id)) {
+            this.leaveOverlay(target.id);
+          }
+        }
+        // broadcast to everyone that i am not there anymore?
+      });
+    })
   }
 
   connection(template) {
@@ -815,27 +840,7 @@ class Template extends EventEmitter {
     myDescriptor.x = descriptor.x;
     myDescriptor.y = descriptor.y;
     myDescriptor.z = descriptor.z;
-
-    // Updating my target overlays
-    this.targets.forEach(target => {
-      // 1. check if target withing my perimeter
-      if (target.isNearby(myDescriptor)) {
-        // 2. if within, check if i already have it
-        if (this.foglet.overlay(target.id)) return;
-        this.buildOverlay(
-          lmerge(target.getOverlay(), {
-            options: {
-              descriptor: myDescriptor
-            }
-          })
-        );
-      } else {
-        if (this.foglet.overlay(target.id)) {
-          this.leaveOverlay(target.id);
-        }
-      }
-      // broadcast to everyone that i am not there anymore?
-    });
+    
     this.emit("descriptor-updated", { id: this.foglet.inViewID, descriptor });
   }
 
