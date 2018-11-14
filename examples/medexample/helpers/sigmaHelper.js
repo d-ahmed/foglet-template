@@ -27,28 +27,33 @@ const addTemplateToGraph = (container, template, options) => {
     label: `${id.substring(0, 4)}(${x},${y})`,
     x,
     y,
-    size: 3,
+    size: 2,
     color
   });
   container.refresh();
 };
 
-const addEdge = (container, source, target) => {
+const addEdge = (container, source, target, options = {}) => {
   try {
     let exists = false;
     container.graph.edges().forEach(edge => {
       if (edge.id == source + "-" + target) exists = true;
     });
     if (exists) return;
-    container.graph.addEdge({
-      id: source + "-" + target,
-      source,
-      target,
-      type: "curvedArrow"
-    });
+    container.graph.addEdge(
+      Object.assign(
+        {
+          id: source + "-" + target,
+          source,
+          target,
+          type: "curvedArrow"
+        },
+        options
+      )
+    );
     container.refresh();
   } catch (e) {
-    console.log("error connecting edges", e);
+    // console.log("error connecting edges", e);
   }
 };
 
