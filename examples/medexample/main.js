@@ -7,10 +7,12 @@ const MAX_PEERS = 10;
 //myChart;
 const overlay = createSigma("overlay");
 // Creating peers and sigma nodes
-const max = 30;
+const MAX_NODES = 100;
 const peers = [];
 const delta = 2 * 1000;
-for (let i = 0; i < max; i++) {
+
+const getRandom = () => Math.floor(Math.random() * MAX_NODES);
+for (let i = 0; i < MAX_NODES; i++) {
   // const fogletTemplate = new template(undefined, true);
   const fogletTemplate = new template(
     {
@@ -27,9 +29,9 @@ for (let i = 0; i < max; i++) {
               maxPeers: MAX_PEERS,
               descriptor: {
                 id: i + "",
-                x: i * 2, // Math.floor(Math.random() * max), // 
-                y: i % 5,  // Math.floor(Math.random() * max), // 
-                z: Math.floor(Math.random() * max)
+                x: getRandom(), //
+                y: getRandom(), //
+                z: getRandom()
                 //  x: i,
                 //  y: i % 3
               }
@@ -77,10 +79,27 @@ Array.from(peers, (peer, index) => {
 });
 
 // spawnTarget(30);
-spawnTarget(1, { coordinates: { x: 0, y: 0 }, perimeter: 20 });
-/*spawnTarget(2, { coordinates: { x: 100, y: 50 }, perimeter: 20 });
-spawnTarget(3, { coordinates: { x: 150, y: 130 }, perimeter: 30 });
-spawnTarget(4, { coordinates: { x: 50, y: 130 }, perimeter: 20 });*/
+spawnTarget("a" + getRandom() * 100, {
+  coordinates: { x: getRandom(), y: getRandom() },
+  perimeter: 10
+});
+spawnTarget("a" + getRandom() * 100, {
+  coordinates: { x: getRandom(), y: getRandom() },
+  perimeter: 15
+});
+spawnTarget("a" + getRandom() * 100, {
+  coordinates: { x: getRandom(), y: getRandom() },
+  perimeter: 25
+});
+spawnTarget("a" + getRandom() * 100, {
+  coordinates: { x: getRandom(), y: getRandom() },
+  perimeter: 30
+});
+
+// spawnTarget(4, {
+//   coordinates: { x: getRandom(), y: getRandom() },
+//   perimeter: 20
+// });
 
 // setInterval(() => {
 //   refresh();
