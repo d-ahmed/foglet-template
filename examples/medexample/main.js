@@ -7,7 +7,7 @@ const MAX_PEERS = 0;
 //myChart;
 const overlay = createSigma("overlay");
 // Creating peers and sigma nodes
-const max = 100;
+const max = 20;
 const peers = [];
 const delta = 2 * 1000
 for (let i = 0; i < max; i++) {
@@ -25,9 +25,10 @@ for (let i = 0; i < max; i++) {
               pendingTimeout: 5 * 1000,
               maxPeers: MAX_PEERS,
               descriptor: {
+                id: i + '',
                 cibles:[],
-                x:   Math.floor(Math.random() * max), //i * 2, // 
-                y:    Math.floor(Math.random() * max), //  i % 5, //  
+                x:   i * 2, //   Math.floor(Math.random() * max), //
+                y:    i % 3, //  Math.floor(Math.random() * max), //  
                 z: Math.floor(Math.random() * max),
               }
             }
@@ -53,6 +54,14 @@ for (let i = 0; i < max; i++) {
   //fogletTemplate.on("overlay-open", id => electLeader());
   //fogletTemplate.on("rps-close", id => electLeader());
   //fogletTemplate.on("overlay-close", id => electLeader());
+  /*fogletTemplate.on("overlay-open", id => {
+    addEdge(overlay, fgId, id);
+    // console.log("overlay-open ", `${fgId}-${id}`);
+  });
+  fogletTemplate.on("overlay-close", id => {
+    // console.log("overlay-close ", `${id}-${fgId}`);
+    dropEdge(overlay, `${id}-${fgId}`);
+  });*/
   fogletTemplate.on("descriptor-updated", ({ id, descriptor }) => {
     // updateNode(rps, id, descriptor);
     updateNode(overlay, id, descriptor);
@@ -170,7 +179,7 @@ peersNeighbours2 = (peers) => {
 
 setInterval(()=>{
   refresh()
-}, 0.5*1000)
+}, 2*1000)
 
 refresh = () =>{
   let peersN = peersNeighbours2(peers)
@@ -279,7 +288,7 @@ doConvergence = () => {
     }
     ++cpt
     span.innerHTML = conv+ '%'
-  }, 1 * 1000)
+  }, Math.log2(max) * 1000)
 }
 
 let axeY = [0];
@@ -291,7 +300,7 @@ doPlot =  (cpt,conv) => {
   graph = createGraph(axeX, axeY)
 }
 
-doConvergence();
+// doConvergence();
 
 let idCible =0;
 
@@ -366,4 +375,8 @@ electLeader = ()=> {
       })
     })
   })}
-  electLeader();
+  // electLeader();
+
+  addCible(4,1,4)
+  addCible(24,1,4)
+  addCible(34,1,4)
