@@ -7,7 +7,7 @@ const MAX_PEERS = 0;
 //myChart;
 const overlay = createSigma("overlay");
 // Creating peers and sigma nodes
-const max = 20;
+const max = 100;
 const peers = [];
 const delta = 2 * 1000
 for (let i = 0; i < max; i++) {
@@ -26,9 +26,8 @@ for (let i = 0; i < max; i++) {
               maxPeers: MAX_PEERS,
               descriptor: {
                 id: i + '',
-                cibles:[],
-                x:   i * 2, //   Math.floor(Math.random() * max), //
-                y:    i % 3, //  Math.floor(Math.random() * max), //  
+                x:   Math.floor(Math.random() * max), // i * 2, //   
+                y:    Math.floor(Math.random() * max), //  i % 5, //  
                 z: Math.floor(Math.random() * max),
               }
             }
@@ -304,13 +303,13 @@ doPlot =  (cpt,conv) => {
 
 let idCible =0;
 
-addCible = (x, y, perimettre)=>{
+addCible = (x, y, perimeter)=>{
   const id = 'C-' + idCible
   const cible = {
     id: id,
     x:x,
     y:y,
-    perimettre:perimettre
+    perimeter:perimeter
   }
   peers.forEach(peer=>{
     peer.foglet.overlay('tman')._network.addCible(cible)
@@ -377,6 +376,6 @@ electLeader = ()=> {
   })}
   // electLeader();
 
-  addCible(4,1,4)
-  addCible(24,1,4)
-  addCible(34,1,4)
+  addCible(50,50,20)
+  addCible(18,78,10)
+  // addCible(70,70,20)
