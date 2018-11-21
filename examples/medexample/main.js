@@ -378,6 +378,6 @@ electLeader = ()=> {
   })}
   // electLeader();
 
-  addCible(0,0,5)
+  addCible(2,0,5)
   // addCible(18,78,15)
   // addCible(10,20,20)

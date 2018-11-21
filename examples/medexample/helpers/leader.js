@@ -1,5 +1,15 @@
+/**
+ *
+ *
+ * @class Leader
+ */
 class Leader{
 
+    /**
+     *Creates an instance of Leader.
+     * @param {*} [template=null]
+     * @memberof Leader
+     */
     constructor(template = null){
         this.template = template;
 
@@ -37,8 +47,14 @@ class Leader{
         }
     }
 
+    /**
+     *
+     *
+     * @memberof Leader
+     */
     doLeaderElection(){
-        
+        if(!this.template) return;
+
         let network = this.template.foglet.overlay('tman')._network;
         let rps = network._rps;
         let myPeers = Array.from(rps.partialView.values()).map(evp=>evp.descriptor);
@@ -60,6 +76,12 @@ class Leader{
         }
     }
 
+    /**
+     *
+     *
+     * @returns
+     * @memberof Leader
+     */
     getLeaders(){
         return Array.from(this.leaderOfCible.values()).map(desc=>desc.id);
     }
