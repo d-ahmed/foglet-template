@@ -7,8 +7,9 @@ const MAX_PEERS = 0;
 //myChart;
 const overlay = createSigma("overlay");
 // Creating peers and sigma nodes
-const max = 100;
+const max = 10;
 const peers = [];
+const leaders = [];
 const delta = 2 * 1000
 for (let i = 0; i < max; i++) {
   //  const fogletTemplate = new template(undefined, true);
@@ -26,8 +27,8 @@ for (let i = 0; i < max; i++) {
               maxPeers: MAX_PEERS,
               descriptor: {
                 id: i + '',
-                x:   Math.floor(Math.random() * max), // i * 2, //   
-                y:    Math.floor(Math.random() * max), //  i % 5, //  
+                x:   i * 2, //   Math.floor(Math.random() * max), // 
+                y:    i % 5, //  Math.floor(Math.random() * max), //  
                 z: Math.floor(Math.random() * max),
               }
             }
@@ -40,6 +41,7 @@ for (let i = 0; i < max; i++) {
 
 
   peers.push(fogletTemplate);
+  leaders.push(new Leader(fogletTemplate))
   // Add nodes to graph
   const options = {
     color: randomColor(),
@@ -376,6 +378,6 @@ electLeader = ()=> {
   })}
   // electLeader();
 
-  addCible(50,50,20)
-  addCible(18,78,10)
-  // addCible(70,70,20)
+  addCible(0,0,5)
+  // addCible(18,78,15)
+  // addCible(10,20,20)
