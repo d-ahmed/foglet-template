@@ -62,7 +62,6 @@ const randomColor = () => {
 };
 
 const updateNode = (container, id, data) => {
-  console.log(data)
   const { x, y } = data;
   const node = container.graph.nodes(id);
   node.x = x;

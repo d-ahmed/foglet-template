@@ -15,13 +15,21 @@ class Leader{
 
         this.leaderOfCible = new Map()
 
-        this.template.on('overlay-open', (id) => {
+        /*this.template.on('overlay-open', (id) => {
             this.doLeaderElection();
         })
 
         this.template.on('overlay-close', (id) => {
             this.doLeaderElection();
         })
+
+        this.template.on('descriptor-updated', ({ id, descriptor }) => {
+            this.doLeaderElection();
+        })*/
+
+        let period = setInterval(()=>{
+            this.doLeaderElection();
+        }, this.template.foglet.overlay('tman')._network._rps.options.delta)
 
         this.ranking = (neighbor, callkack) => (a, b) => {
                 const getDistance = (descriptor1, descriptor2) => {
@@ -57,8 +65,14 @@ class Leader{
 
         let network = this.template.foglet.overlay('tman')._network;
         let rps = network._rps;
-        let myPeers = Array.from(rps.partialView.values()).map(evp=>evp.descriptor);
-        myPeers.push(rps.options.descriptor);
+        let myPeers = Array.from(rps.partialView.values()).map(evp=>{
+            let descriptor = evp.descriptor;
+            descriptor.peer = evp.peer;
+            return descriptor;
+        });
+        let descriptor = JSON.parse(JSON.stringify(rps.options.descriptor));
+        descriptor.peer = network.inviewId;
+        myPeers.push(descriptor);
         let cibles = network.myCibles;
 
         Array.from(this.leaderOfCible.keys(), key=>{
@@ -83,6 +97,6 @@ class Leader{
      * @memberof Leader
      */
     getLeaders(){
-        return Array.from(this.leaderOfCible.values()).map(desc=>desc.id);
+        return Array.from(this.leaderOfCible.values()).map(desc=>desc.peer || desc.id);
     }
 }

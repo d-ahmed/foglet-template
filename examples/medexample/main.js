@@ -7,7 +7,7 @@ const MAX_PEERS = 0;
 //myChart;
 const overlay = createSigma("overlay");
 // Creating peers and sigma nodes
-const max = 10;
+const max = 100;
 const peers = [];
 const leaders = [];
 const delta = 2 * 1000
@@ -27,8 +27,8 @@ for (let i = 0; i < max; i++) {
               maxPeers: MAX_PEERS,
               descriptor: {
                 id: i + '',
-                x:   i * 2, //   Math.floor(Math.random() * max), // 
-                y:    i % 5, //  Math.floor(Math.random() * max), //  
+                x:   Math.floor(Math.random() * max), // i * 2, //   
+                y:    Math.floor(Math.random() * max), //  i % 5, //  
                 z: Math.floor(Math.random() * max),
               }
             }
@@ -378,6 +378,6 @@ electLeader = ()=> {
   })}
   // electLeader();
 
-  addCible(2,0,5)
-  // addCible(18,78,15)
+  addCible(30,30,20)
+  addCible(18,78,15)
   // addCible(10,20,20)
