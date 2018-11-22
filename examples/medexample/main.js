@@ -81,7 +81,10 @@ Array.from(peers, (peer, index) => {
   return new Promise(
     (resolve, reject) =>
       setTimeout(() => {
-        peer.connection(randomPeer).then(resolve);
+        peer.connection(randomPeer, null).then(()=>{
+          peer.foglet.overlay('tman')._network._rps._start();
+          resolve()
+        });
       }, index*0.5*1000),
   );
 })
@@ -378,6 +381,6 @@ electLeader = ()=> {
   })}
   // electLeader();
 
-  addCible(30,30,20)
-  addCible(18,78,15)
+  // addCible(30,30,20)
+  // addCible(18,78,15)
   // addCible(10,20,20)
