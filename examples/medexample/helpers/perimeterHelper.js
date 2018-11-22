@@ -6,7 +6,7 @@ const spawnTarget = (targetId, options = {}) => {
   const color = randomColor();
   addNode(overlay, {
     id: spawned.id,
-    label: `${spawned.id}`,
+    label: `p-${targetId}(${x}, ${y})`,
     x,
     y,
     size: 4,

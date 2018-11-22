@@ -4,6 +4,7 @@ const createSigma = (container, settings = {}) => {
   const defaultSettings = {
     minArrowSize: 6
   };
+
   return new sigma({
     renderer: {
       container,
@@ -20,7 +21,7 @@ const addNode = (container, options) => {
 
 const addTemplateToGraph = (container, template, options) => {
   const { index, color } = options;
-  const { x, y } = template.foglet.overlay("tman").network.descriptor;
+  const { x, y } = template.getDescriptor();
   const id = template.foglet.inViewID;
   addNode(container, {
     id,
