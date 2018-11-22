@@ -34,10 +34,20 @@ const options = {
     index: null
 };
 
+const {x, y} = fogletTemplate.foglet.overlay('tman')._network._rps.options.descriptor;
+
 addNode(overlay, fogletTemplate.foglet.inViewID, {
-    x:Math.floor(Math.random()*max),
-    y:Math.floor(Math.random()*max)
+    x,
+    y
 }, options);
+
+
+pos = (template, id=null) =>{
+    let partial = template.foglet.overlay('tman')._network._rps.partialView;
+    let descriptors = Array.from(partial.values()).filter(peer=>peer.peer === id).map(r=>r.descriptor)
+    if(descriptors.length>0) return descriptors[0]
+    return null;
+}
 
 // fogletTemplate.foglet.share()
 fogletTemplate.connection(null, null).then(() => {
@@ -45,14 +55,24 @@ fogletTemplate.connection(null, null).then(() => {
     fogletTemplate.foglet.overlay('tman')._network.addCible({id:'C-0', x:10, y:10, perimettre:100});
     fogletTemplate.on("overlay-open", id => {
         console.log('overlay-open', id);
-        addNode(overlay, id, {
+        pos(fogletTemplate, id)
+        const {x, y} = pos(fogletTemplate, id) || {
             x:Math.floor(Math.random()*max),
             y:Math.floor(Math.random()*max)
+        }
+        addNode(overlay, id, {
+            x,
+            y
         }, options);
     });
+
+    fogletTemplate.on("overlay-close", id => {
+        console.log('overlay-close', id);
+        dropNode(overlay, id);
+    });
+
     fogletTemplate.on("rps-open", id => {
-        console.log('rps-open', id);
-        
+        // console.log('rps-open', id);
         // addTemplateToGraph(rps, fogletTemplate, options);
         
     });

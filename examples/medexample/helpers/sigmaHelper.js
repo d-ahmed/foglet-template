@@ -41,6 +41,10 @@ const addNode = (container, id, {x,y}, options) => {
   container.refresh();
 };
 
+dropNode = (container, id) => {
+  container.graph.dropNode(id)
+}
+
 const addEdge = (container, source, target) => {
   let exists = false;
   container.graph.edges().forEach(edge => {
@@ -55,6 +59,8 @@ const addEdge = (container, source, target) => {
   });
   container.refresh();
 };
+
+
 
 const dropEdge = (container, id) => {
   let exists = false;
