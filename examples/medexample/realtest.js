@@ -64,11 +64,13 @@ fogletTemplate.connection(null, null).then(() => {
             x,
             y
         }, options);
+        addEdge(overlay, fogletTemplate.foglet.inViewID, id)
     });
 
     fogletTemplate.on("overlay-close", id => {
         console.log('overlay-close', id);
         dropNode(overlay, id);
+        dropEdge(overlay, `${fogletTemplate.foglet.inViewID}-${id}`);
     });
 
     fogletTemplate.on("rps-open", id => {
