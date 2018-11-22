@@ -49,10 +49,32 @@ pos = (template, id=null) =>{
     return null;
 }
 
+addCible = (idCible, x, y, perimeter)=>{
+    const id = 'C-' + idCible
+    const cible = {
+      id: id,
+      x:x,
+      y:y,
+      perimeter:perimeter
+    }
+    fogletTemplate.foglet.overlay('tman')._network.addCible(cible);
+    overlay.graph.addNode({
+      id: cible.id,
+      label: cible.id,
+      x: cible.x,
+      y: cible.y,
+      size: 5,
+      color: randomColor()
+    });
+    overlay.refresh()
+}
+
+addCible(1,5,5,5)
+
 // fogletTemplate.foglet.share()
 fogletTemplate.connection(null, null).then(() => {
     fogletTemplate.foglet.overlay('tman')._network._rps._start();
-    fogletTemplate.foglet.overlay('tman')._network.addCible({id:'C-0', x:10, y:10, perimettre:100});
+    
     fogletTemplate.on("overlay-open", id => {
         console.log('overlay-open', id);
         pos(fogletTemplate, id)
