@@ -389,6 +389,7 @@ module.exports = class Overlay extends TMAN {
       const overlay = this.options.pid;
       this._rps.parent.getPeers().forEach(peerId => {
           this._manager
+          .overlay(overlay) && this._manager
           .overlay(overlay)
           .communication.sendUnicast(
             peerId,
@@ -469,37 +470,8 @@ module.exports = class Perimeter extends TMAN {
       descriptor: this._rps.options.descriptor
     };
 
-    this._updateLeader();
   }
 
-  _updateLeader(delay = this.options.delta) {
-    setInterval(() => {
-      const overlay = this.options.pid;
-      const manager = this._manager.overlay(overlay);
-
-      const neighbours = manager._network.getNeighbours();
-      neighbours.forEach(neighbour => {
-        const {
-          id: leaderId,
-          descriptor: leaderPos
-        } = this.options.target.leader;
-
-        const targetPos = this.options.target.coordinates;
-        const neighbourPos = this._rps.partialView.get(neighbour).descriptor;
-        const distance1 = this.getDistance(leaderPos, targetPos);
-        const distance2 = this.getDistance(neighbourPos, targetPos);
-        if (
-          distance2 < distance1 ||
-          (distance2 === distance1 && neighbour < leaderId)
-        ) {
-          this.options.target.leader = {
-            id: neighbour,
-            descriptor: neighbourPos
-          };
-        }
-      });
-    }, delay);
-  }
 
   /**
    * Gives the start descriptor used by the TMan overlay (can be an empty object).
@@ -723,6 +695,7 @@ class Template extends EventEmitter {
           );
         } else {
           if (this.foglet.overlay(target.id)) {
+            console.log('leave overlay')
             this.leaveOverlay(target.id);
           }
         }
@@ -781,22 +754,25 @@ class Template extends EventEmitter {
     myDescriptor.x = descriptor.x;
     myDescriptor.y = descriptor.y;
     myDescriptor.z = descriptor.z;
-
-    this.foglet
+    
+    // TOCHANGE
+    /*this.foglet
       .overlay(overlay)
       .network._rps.parent.getPeers()
       .forEach(peerId => {
         this.sendOverlayUnicast(
+          overlay,
           peerId,
           new MUpdatePartialView(this.foglet.inViewID, myDescriptor)
         );
-      });
+      });*/
 
     this.emit("descriptor-updated", {
       id: this.foglet.inViewID,
       descriptor: myDescriptor
     });
   }
+
 
   buildOverlay(overlay) {
     this.foglet._networkManager._buildOverlay(overlay);
@@ -815,7 +791,12 @@ class Template extends EventEmitter {
   }
 
   leaveOverlay(overlay) {
-    return this.foglet.unshare(overlay);
+    this.foglet.overlay(overlay)._network._rps._stop()
+    this.foglet.overlay(overlay)._network.getNeighbours().forEach(peerId=>{
+        this.foglet.overlay(overlay)._network._rps.disconnect(peerId)
+    })
+    
+    return Promise.resolve();
   }
 
   targetSpawned(target) {
@@ -827,15 +808,6 @@ class Template extends EventEmitter {
         options: { descriptor: this.getDescriptor() }
       })
     );
-
-    //    this.neighbours().forEach(neighbourId => {
-    //      this.foglet.overlay(target.id).network.rps.send(neighbourId, {
-    //        peer: this.foglet.inViewID,
-    //        descriptor: this.getDescriptor(),
-    //        sample: [this.foglet.inViewID],
-    //        type: "MSuggest"
-    //      });
-    //    });
     return true;
   }
 
