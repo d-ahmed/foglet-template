@@ -381,31 +381,24 @@ module.exports = class Overlay extends TMAN {
           }
         }
       });
-    }, 0.5 * 1000);
+    }, 1 * 1000);
   }
 
   _updateCache(delay = this.options.delta) {
-    
-    
     this.periodic = setInterval(() => {
       const overlay = this.options.pid;
       this._rps.parent.getPeers().forEach(peerId => {
-        this._manager
+          this._manager
           .overlay(overlay)
           .communication.sendUnicast(
             peerId,
             new MUpdateCache(this.inviewId, this._rps.options.descriptor)
-          );
-          if(this.options.descriptor.id==="1"){
-            //console.log(this.options, this._rps.options)
-          }
-          
-      });
-      
-      this._rps.parent.getPeers().forEach(peerId => {
-        this._manager.overlay(overlay).communication.sendUnicast(peerId, new MUpdatePartialView(this.inviewId, this._rps.options.descriptor))
-      });
+          ).then().catch(
+            e => {
 
+            }
+          );
+      });
     }, 2 * 1000);
   }
 
@@ -468,7 +461,6 @@ const MUpdateCache = __webpack_require__(/*! ./messages/mupdatecache.js */ "./li
 const TMAN = __webpack_require__(/*! ./overlay */ "./lib/overlay/overlay.js");
 const MUpdatePartialView = __webpack_require__(/*! ./messages/mupdatepartialview.js */ "./lib/overlay/messages/mupdatepartialview.js");
 
-
 module.exports = class Perimeter extends TMAN {
   constructor(...Args) {
     super(...Args);
@@ -485,7 +477,6 @@ module.exports = class Perimeter extends TMAN {
       const overlay = this.options.pid;
       const manager = this._manager.overlay(overlay);
 
-      
       const neighbours = manager._network.getNeighbours();
       neighbours.forEach(neighbour => {
         const {
@@ -498,7 +489,7 @@ module.exports = class Perimeter extends TMAN {
         const distance1 = this.getDistance(leaderPos, targetPos);
         const distance2 = this.getDistance(neighbourPos, targetPos);
         if (
-          (distance2 < distance1) ||
+          distance2 < distance1 ||
           (distance2 === distance1 && neighbour < leaderId)
         ) {
           this.options.target.leader = {
@@ -524,28 +515,7 @@ module.exports = class Perimeter extends TMAN {
     };
   }
 
-  _updateCache(delay = this.options.delta) {
-    const overlay = this.options.pid;
-    setInterval(() => {
-        this._manager
-        .overlay(overlay)
-        ._network.getNeighbours()
-        .forEach(peerId => {
-          this._manager
-            .overlay(overlay)
-            .communication.sendUnicast(
-              peerId,
-              new MUpdateCache(this.inviewId, this._rps.options.descriptor)
-            );
-        });
 
-        this._manager
-        .overlay(overlay)
-        ._network.getNeighbours().forEach(peerId => {
-          this._manager.overlay(overlay).communication.sendUnicast(peerId, new MUpdatePartialView(this.inviewId, this._rps.options.descriptor))
-        });
-    }, 2 * 1000);
-  }
 
   getDistance(descriptor1, descriptor2) {
     const { x: xa, y: ya, z: za } = descriptor1;
@@ -574,11 +544,10 @@ module.exports = class Perimeter extends TMAN {
    * @return {integer} `0 if peerA == peerB`, `1 if peerA < peerB` and `-1 if peerA > peerB` (according to the ranking algorithm)
    */
   _rankPeers(neighbour, descriptorA, descriptorB, peerA, peerB) {
-    const { coordinates, perimeter } = this.options.target;
-    return this.isNearby(coordinates, descriptorA, perimeter) ? -1 : 1;
+    return 1;
+    //   const { coordinates, perimeter } = this.options.target;
+    //   return this.isNearby(coordinates, descriptorA, perimeter) ? -1 : 1;
   }
-
-  
 };
 
 
@@ -596,7 +565,7 @@ const lmerge = __webpack_require__(/*! lodash.merge */ "./node_modules/lodash.me
 
 module.exports = class Target {
   constructor(id, options) {
-    this.id = "perimeter-" + id;
+    this.id = "p-" + id;
     const perimeter = 7;
     const coordinates = {
       x: id,
@@ -618,6 +587,7 @@ module.exports = class Target {
             delta: 2 * 1000,
             timeout: 5 * 1000,
             pendingTimeout: 5 * 1000,
+            descriptorTimeout: 1000 * 1000,
             maxPeers: Infinity,
             target: {
               perimeter,
@@ -675,7 +645,6 @@ module.exports = class Target {
 const FC = __webpack_require__(/*! foglet-core */ "./node_modules/foglet-core/foglet-core.js");
 const Foglet = FC.Foglet;
 const lmerge = __webpack_require__(/*! lodash.merge */ "./node_modules/lodash.merge/index.js");
-const Overlay = __webpack_require__(/*! ./overlay/overlay.js */ "./lib/overlay/overlay.js");
 const debug = __webpack_require__(/*! debug */ "./node_modules/debug/src/browser.js")("template");
 const EventEmitter = __webpack_require__(/*! events */ "./node_modules/events/events.js");
 const MUpdatePartialView = __webpack_require__(/*! ./overlay/messages/mupdatepartialview.js */ "./lib/overlay/messages/mupdatepartialview.js");
@@ -698,8 +667,8 @@ class Template extends EventEmitter {
               },
               timeout: 2 * 1000, // spray-wrtc timeout before definitively close a WebRTC connection.
               pendingTimeout: 5 * 1000, // time before the connection timeout in neighborhood-wrtc
-              delta: 1 * 1000, // spray-wrtc shuffle interval
-              maxPeers: 100,
+              delta: 5 * 1000, // spray-wrtc shuffle interval
+              maxPeers: 1000,
               a: 1, // for spray: a*ln(N) + b, inject a arcs
               b: 0, // for spray: a*ln(N) + b, inject b arcs
               signaling: {
@@ -709,24 +678,6 @@ class Template extends EventEmitter {
               }
             }
           },
-          overlays: [
-            {
-              name: "tman",
-              class: Overlay,
-              options: {
-                delta: 2 * 1000,
-                timeout: 5 * 1000,
-                pendingTimeout: 5 * 1000,
-                maxPeers: 3,
-                protocol: "foglet-template-overlay", // foglet running on the protocol foglet-example, defined for spray-wrtc
-                signaling: {
-                  address: "https://signaling.herokuapp.com/",
-                  // signalingAdress: 'https://signaling.herokuapp.com/', // address of the signaling server
-                  room: "room-foglet-template-overlay" // room to join
-                }
-              }
-            }
-          ],
           ssh: undefined /* {
           address: 'http://localhost:4000/'
         } */
@@ -739,48 +690,25 @@ class Template extends EventEmitter {
       this.options.foglet.rps.options.socketClass = __webpack_require__(/*! foglet-core */ "./node_modules/foglet-core/foglet-core.js").SimplePeerMoc;
     }
     this.foglet = new Foglet(this.options.foglet);
-    this.foglet.onUnicast((id, message) => {
-      this.emit("receive-rps", id, message);
-    });
-    this.foglet.overlay("tman").communication.onUnicast((id, message) => {
-      debug(
-        "[%s] Receiving on the overlay from %s message:",
-        this.foglet.inViewID,
-        id,
-        message
-      );
-      this.emit("receive-overlay", id, message);
-    });
+
     this.foglet.overlay().network.rps.on("open", id => {
       debug("[%s] connection opened on the rps: ", this.foglet.inViewID, id);
       this.emit("rps-open", id);
     });
-    this.foglet.overlay("tman")._network._rps.on("open", id => {
-      debug(
-        "[%s] connection opened on the overlay: ",
-        this.foglet.inViewID,
-        id
-      );
-      this.emit("overlay-open", id);
-    });
+
     this.foglet.overlay().network.rps.on("close", id => {
       debug("[%s] connection closed on the rps: ", this.foglet.inViewID, id);
       this.emit("rps-close", id);
     });
-    this.foglet.overlay("tman")._network._rps.on("close", id => {
-      debug(
-        "[%s] connection closed on the overlay: ",
-        this.foglet.inViewID,
-        id
-      );
-      this.emit("overlay-close", id);
-    });
 
-    this.targets = [];
     debug("Template initialized.");
 
-    this.on('descriptor-updated', (descriptor) => {
-      const myDescriptor = descriptor.descriptor
+    // Added functionalities ______________________________
+    this.targets = [];
+
+    this.on("descriptor-updated", descriptor => {
+      // TOCHANGE
+      const myDescriptor = descriptor.descriptor;
       this.targets.forEach(target => {
         // 1. check if target withing my perimeter
         if (target.isNearby(myDescriptor)) {
@@ -800,13 +728,16 @@ class Template extends EventEmitter {
         }
         // broadcast to everyone that i am not there anymore?
       });
-    })
+    });
   }
 
-  connection(template) {
-    if (template) return this.foglet.connection(template.foglet, "tman");
-    this.foglet.share();
-    return this.foglet.connection(undefined, "tman");
+  connection(template = undefined, overlay = undefined) {
+    if (!overlay && !!template) return this.foglet.connection(template.foglet);
+    if (overlay) {
+      this.foglet.share();
+      return this.foglet.connection(template, overlay);
+    }
+    return Promise.reject();
   }
 
   sendUnicast(id, message) {
@@ -819,8 +750,8 @@ class Template extends EventEmitter {
     });
   }
 
-  sendOverlayUnicast(id, message) {
-    return this.foglet.overlay("tman").communication.sendUnicast(id, message);
+  sendOverlayUnicast(overlay, id, message) {
+    return this.foglet.overlay(overlay).communication.sendUnicast(id, message);
   }
 
   sendOverlayUnicastAll(message) {
@@ -837,9 +768,15 @@ class Template extends EventEmitter {
     return this.foglet.overlay(overlay).network.getNeighbours();
   }
 
-  updateDescriptor(descriptor, overlay = "tman") {
-    
-    const myDescriptor = this.foglet.overlay(overlay).network.descriptor = this.foglet.overlay(overlay).network.options.descriptor;
+  updateDescriptor(descriptor, overlay) {
+    // TOCHANGE
+    if (!overlay) return console.log("please specify an overlay");
+
+    const myDescriptor = (this.foglet.overlay(
+      overlay
+    ).network.descriptor = this.foglet.overlay(
+      overlay
+    ).network.options.descriptor);
 
     myDescriptor.x = descriptor.x;
     myDescriptor.y = descriptor.y;
@@ -854,46 +791,63 @@ class Template extends EventEmitter {
           new MUpdatePartialView(this.foglet.inViewID, myDescriptor)
         );
       });
-    
-    this.emit("descriptor-updated", { id: this.foglet.inViewID, descriptor: myDescriptor });
+
+    this.emit("descriptor-updated", {
+      id: this.foglet.inViewID,
+      descriptor: myDescriptor
+    });
   }
 
   buildOverlay(overlay) {
     this.foglet._networkManager._buildOverlay(overlay);
-    this.foglet.overlay(overlay.name)._network._rps.on("open", id => {
-      debug("[%s] connection opened on the overlay: ", overlay.name);
+    this.foglet.overlay(overlay.name).network.rps.on("open", id => {
+      debug("[%s] connection opened on the rps: ", this.foglet.inViewID, id);
       this.emit(overlay.name + "-open", id);
     });
 
-    this.foglet.overlay(overlay.name)._network._rps.on("close", id => {
-      debug("[%s] connection closed on the overlay: ", overlay.name);
+    this.foglet.overlay(overlay.name).network.rps.on("close", id => {
+      debug("[%s] connection closed on the rps: ", this.foglet.inViewID, id);
       this.emit(overlay.name + "-close", id);
     });
 
-    this.foglet.share(overlay.name);
-    return this.foglet.connection(undefined, overlay.name);
+    this.foglet.overlay(overlay.name)._network._rps._start();
+    return Promise.resolve();
   }
 
   leaveOverlay(overlay) {
-    
     return this.foglet.unshare(overlay);
   }
 
   targetSpawned(target) {
-    const descriptor = this.foglet.overlay("tman").network.descriptor;
+    // TOCHANGE
     this.targets.push(target);
-    if (!target.isNearby(descriptor)) return;
+    if (!target.isNearby(this.getDescriptor())) return;
     this.buildOverlay(
       lmerge(target.getOverlay(), {
-        options: { descriptor: this.foglet.overlay("tman").network.descriptor }
+        options: { descriptor: this.getDescriptor() }
       })
     );
+
+    //    this.neighbours().forEach(neighbourId => {
+    //      this.foglet.overlay(target.id).network.rps.send(neighbourId, {
+    //        peer: this.foglet.inViewID,
+    //        descriptor: this.getDescriptor(),
+    //        sample: [this.foglet.inViewID],
+    //        type: "MSuggest"
+    //      });
+    //    });
     return true;
   }
 
   getLeader(overlay) {
     const leader = this.foglet.overlay(overlay).network.options.target.leader;
     return leader;
+  }
+  getDescriptor() {
+    return this.descriptor;
+  }
+  setDescriptor(descriptor) {
+    this.descriptor = descriptor;
   }
 }
 
@@ -7667,10 +7621,10 @@ module.exports = Object.keys || function keys (obj){
 ;(function(root) {
 
 	// Detect free variables `exports`
-	var freeExports = typeof exports == 'object' && exports;
+	var freeExports =  true && exports;
 
 	// Detect free variable `module`
-	var freeModule = typeof module == 'object' && module &&
+	var freeModule =  true && module &&
 		module.exports == freeExports && module;
 
 	// Detect free variable `global`, from Node.js or Browserified code,
@@ -15188,7 +15142,7 @@ var freeSelf = typeof self == 'object' && self && self.Object === Object && self
 var root = freeGlobal || freeSelf || Function('return this')();
 
 /** Detect free variable `exports`. */
-var freeExports = typeof exports == 'object' && exports && !exports.nodeType && exports;
+var freeExports =  true && exports && !exports.nodeType && exports;
 
 /** Detect free variable `module`. */
 var freeModule = freeExports && typeof module == 'object' && module && !module.nodeType && module;
@@ -15831,7 +15785,7 @@ var freeSelf = typeof self == 'object' && self && self.Object === Object && self
 var root = freeGlobal || freeSelf || Function('return this')();
 
 /** Detect free variable `exports`. */
-var freeExports = typeof exports == 'object' && exports && !exports.nodeType && exports;
+var freeExports =  true && exports && !exports.nodeType && exports;
 
 /** Detect free variable `module`. */
 var freeModule = freeExports && typeof module == 'object' && module && !module.nodeType && module;
@@ -17821,7 +17775,7 @@ var freeSelf = typeof self == 'object' && self && self.Object === Object && self
 var root = freeGlobal || freeSelf || Function('return this')();
 
 /** Detect free variable `exports`. */
-var freeExports = typeof exports == 'object' && exports && !exports.nodeType && exports;
+var freeExports =  true && exports && !exports.nodeType && exports;
 
 /** Detect free variable `module`. */
 var freeModule = freeExports && typeof module == 'object' && module && !module.nodeType && module;
@@ -43049,7 +43003,7 @@ class MSuggest {
      * @param {object[]} sample The sample containing the identifier of peers
      * and their descriptor.
      */
-  constructor (inview, descriptor, sample) {
+  constructor (inview, descriptor, sample, pid) {
     this.peer = inview
     this.descriptor = descriptor
     this.sample = sample
@@ -43341,7 +43295,7 @@ class TMan extends N2N {
           .catch((e) => {
             console.error(e)
           }))
-
+      this.unicast.on('tman-exchange', (id, message) => this._receive(id, message))
       this.unicast.on('requestDescriptor', (requester) => this.unicast.emit('giveDescriptor', requester,
         this.getInviewId(),
         this.options.descriptor)
@@ -43527,9 +43481,26 @@ class TMan extends N2N {
       // #A use our own partial view
       chosen = this.partialView.oldest
       sample = this._getSample(this.partialView.get(chosen))
+      // #2 propose the sample to the chosen one
+      chosen && this.send(chosen, new MSuggest(this.getInviewId(),
+        this.options.descriptor,
+        sample))
+        .then(() => {
+          // #A it seems the message has been sent correctly
+          debug('[%s] %s ==> suggest %s ==> %s',
+            this.PID, this.PEER, sample.length, chosen)
+        })
+        .catch((e) => {
+          // #B the peer cannot be reached, he is supposedly dead
+          debug('[%s] %s =X> suggest =X> %s',
+            this.PID, this.PEER, chosen)
+          fromOurOwn && this._onPeerDown(chosen)
+        })
     } else if (this.parent && this.parent.partialView.size > 0) {
       // #B use the partial view of our parent
       let rnNeighbors = this.parent.getPeers()
+      chosen = rnNeighbors[Math.floor(Math.random() * rnNeighbors.length)]
+      sample = []
       let found = false
       fromOurOwn = false
       while (!found && rnNeighbors.length > 0) {
@@ -43544,22 +43515,23 @@ class TMan extends N2N {
           rnNeighbors.splice(rn, 1)
         }
       }
+      // #2 propose the sample to the chosen one
+      // console.log(chosen, sample)
+      chosen && this.unicast.emit('tman-exchange', chosen, this.getInviewId(), new MSuggest(this.getInviewId(),
+        this.options.descriptor,
+        sample))
+        .then(() => {
+          // #A it seems the message has been sent correctly
+          debug('[%s] %s ==> suggest %s ==> %s',
+            this.PID, this.PEER, sample.length, chosen)
+        })
+        .catch((e) => {
+          // #B the peer cannot be reached, he is supposedly dead
+          debug('[%s] %s =X> suggest =X> %s',
+            this.PID, this.PEER, chosen)
+          fromOurOwn && this._onPeerDown(chosen)
+        })
     }
-    // #2 propose the sample to the chosen one
-    chosen && this.send(chosen, new MSuggest(this.getInviewId(),
-      this.options.descriptor,
-      sample))
-      .then(() => {
-        // #A it seems the message has been sent correctly
-        debug('[%s] %s ==> suggest %s ==> %s',
-          this.PID, this.PEER, sample.length, chosen)
-      })
-      .catch((e) => {
-        // #B the peer cannot be reached, he is supposedly dead
-        debug('[%s] %s =X> suggest =X> %s',
-          this.PID, this.PEER, chosen)
-        fromOurOwn && this._onPeerDown(chosen)
-      })
   }
 
   /**
@@ -43589,15 +43561,16 @@ class TMan extends N2N {
      * @param {MSuggest|MSuggestBack} message The message received.
      */
   _onExchangeBack (peerId, message) {
+    // console.log(peerId, message)
     // #1 keep the best elements from the received sample
     let ranked = []
     // -- begin hot fix, remove duplicates
     const a = new Map()
-    message.sample.forEach((s)=> {
+    message.sample.forEach((s) => {
       a.set(s.peer, s)
     })
     this.partialView.forEach((epv, neighbor) => {
-      if(!a.has(neighbor)) a.set(neighbor, epv)
+      if (!a.has(neighbor)) a.set(neighbor, epv)
     })
     ranked = [...a.values()]
     // -- end hot fix
