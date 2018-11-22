@@ -15,18 +15,6 @@ class Leader{
 
         this.leaderOfCible = new Map()
 
-        /*this.template.on('overlay-open', (id) => {
-            this.doLeaderElection();
-        })
-
-        this.template.on('overlay-close', (id) => {
-            this.doLeaderElection();
-        })
-
-        this.template.on('descriptor-updated', ({ id, descriptor }) => {
-            this.doLeaderElection();
-        })*/
-
         let period = setInterval(()=>{
             this.doLeaderElection();
         }, this.template.foglet.overlay('tman')._network._rps.options.delta)

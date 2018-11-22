@@ -27,6 +27,20 @@ const addTemplateToGraph = (container, template, options) => {
   });
 };
 
+
+const addNode = (container, id, {x,y}, options) => {
+  const { index, color } = options;
+  container.graph.addNode({
+    id,
+    label: `${id.substring(0, 4)}(${x},${y})`,
+    x,
+    y,
+    size: 3,
+    color
+  });
+  container.refresh();
+};
+
 const addEdge = (container, source, target) => {
   let exists = false;
   container.graph.edges().forEach(edge => {
