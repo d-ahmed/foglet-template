@@ -64,3 +64,7 @@ bin/template.bundle.js
 bin/template.bundle.js.map
 
 \.idea/
+
+bin/consensus\.bundle\.js
+
+bin/consensus\.bundle\.js\.map

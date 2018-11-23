@@ -1,10 +1,10 @@
-const { template, target } = consensus; // eslint-disable-line
+const { template, target, Leader } = consensus; // eslint-disable-line
 
 const overlay = createSigma("overlay");
 
 
 const MAX_PEERS = 0;
-const max = 10;
+const max = 100;
 const delta = 5 * 1000
 
 let peers = []
@@ -24,8 +24,8 @@ const fogletTemplate = new template(
 
 fogletTemplate.setDescriptor({
     id: 'da-'+getRandom(100),
-    x: getRandom(10), // i*2, // 
-    y: getRandom(10)// i%5, //
+    x: getRandom(max), // i*2, // 
+    y: getRandom(max)// i%5, //
 });
 
 peers.push(fogletTemplate)
@@ -47,14 +47,13 @@ const options = {
 
 
 
-
 let leader = new Leader(fogletTemplate);
 
 // fogletTemplate.foglet.share()
 fogletTemplate.connection(null, null).then(()=>{
     spawnTarget("1", {
         coordinates: { x: 5, y: 5 },
-        perimeter: 1000
+        perimeter: 5
     });
 });
 
@@ -94,9 +93,9 @@ const refresher = () => {
         perimeter: 1000
     });
 
+    addMyNode(overlay)
     Array.from(fogletTemplate.foglet._networkManager._overlays.keys(), overlay=>{
         let peersN = Array.from(fogletTemplate.foglet.overlay(overlay)._network._rps.partialView.values());
-        addMyNode(overlay)
         addMyNeighbourNodes(peersN)
     })
     
@@ -108,7 +107,7 @@ const refresher = () => {
   }, 1000)
 
   addMyNode = (_overlay)=>{
-    const {x, y} = fogletTemplate.foglet.overlay(_overlay)._network._rps.options.descriptor;
+    const {x, y} = fogletTemplate.getDescriptor();
     const id = fogletTemplate.foglet.inViewID
     addNode(overlay, {
         id,
@@ -125,8 +124,8 @@ const refresher = () => {
   addMyNeighbourNodes = (peersN)=>{
     peersN.forEach(peerN => {
         const {x, y} = peerN.descriptor || {
-            x:Math.floor(Math.random()*max),
-            y:Math.floor(Math.random()*max)
+            x:getRandom(max),
+            y:getRandom(max)
         }
         const id = peerN.peer
         addNode(overlay, {
