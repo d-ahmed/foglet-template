@@ -12,7 +12,7 @@ const MAX_PEERS = 10;
 const overlay = createSigma("overlay");
 
 // Creating peers and sigma nodes
-const MAX_NODES = 20;
+const MAX_NODES = 100;
 const peers = [];
 const leaders = [];
 const delta = 2 * 1000;
@@ -21,12 +21,12 @@ for (let i = 0; i < MAX_NODES; i++) {
   const fogletTemplate = new template({ foglet: { id: i + "" } }, true);
   fogletTemplate.setDescriptor({
     id: i,
-    x: i*2, // getRandom(),
-    y: i%5, //getRandom()
+    x: getRandom(), // i*2, // 
+    y: getRandom()// i%5, //
   });
   peers.push(fogletTemplate);
   leaders.push(new Leader(fogletTemplate))
-  
+
   // Add nodes *to graph
   // addTemplateToGraph(rps, fogletTemplate, {
   //   color: randomColor(),
@@ -65,16 +65,16 @@ Array.from(peers, (peer, index) => {
 });
 
 spawnTarget("1", {
-  coordinates: { x: 0, y: 0 },
-  perimeter: 10
+  coordinates: { x: getRandom(), y: getRandom() },
+  perimeter: 20
 });
 spawnTarget("2", {
-  coordinates: { x: 10, y: 0 },
-  perimeter: 10
+  coordinates: { x: getRandom(), y: getRandom() },
+  perimeter: 20
 });
 spawnTarget("5", {
-  coordinates: { x: 20, y: 0 },
-  perimeter: 5
+  coordinates: { x: getRandom(), y: getRandom() },
+  perimeter: 30
 });
 // spawnTarget("4", { coordinates: { x: 37, y: 3 }, perimeter: 4 });
 

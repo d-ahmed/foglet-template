@@ -34,6 +34,10 @@ const addTemplateToGraph = (container, template, options) => {
   container.refresh();
 };
 
+const dropNode = (container, id) => {
+  container.graph.dropNode(id)
+}
+
 const addEdge = (container, source, target, options = {}) => {
   try {
     let exists = false;

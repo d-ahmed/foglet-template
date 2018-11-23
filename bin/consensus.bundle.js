@@ -364,14 +364,6 @@ module.exports = class Overlay extends TMAN {
       this._manager.overlay(overlay).communication.onUnicast((id, message) => {
         if (message.type === "MUpdateCache") {
           this._rps.cache.set(message.peer, message.descriptor);
-        }
-      });
-    }, 0.5 * 1000);
-
-    setTimeout(() => {
-      this._manager.overlay(overlay).communication.onUnicast((id, message) => {
-        if (message.type === "MUpdatePartialView") {
-          this._rps.cache.set(message.peer, message.descriptor);
           if (this._rps.partialView.has(message.peer)) {
             const myDescriptor = this._rps.partialView.get(message.peer)
               .descriptor;
@@ -381,7 +373,7 @@ module.exports = class Overlay extends TMAN {
           }
         }
       });
-    }, 1 * 1000);
+    }, 0.5 * 1000);
   }
 
   _updateCache(delay = this.options.delta) {
@@ -559,7 +551,7 @@ module.exports = class Target {
             delta: 2 * 1000,
             timeout: 5 * 1000,
             pendingTimeout: 5 * 1000,
-            descriptorTimeout: 1000 * 1000,
+            // descriptorTimeout: 1000 * 1000,
             maxPeers: Infinity,
             target: {
               perimeter,
@@ -628,7 +620,7 @@ class Template extends EventEmitter {
       {
         foglet: {
           verbose: true, // want some logs ? switch to false otherwise
-          rps: {
+          rps:{
             type: "cyclon",
             options: {
               protocol: "foglet-template", // foglet running on the protocol foglet-example, defined for spray-wrtc
@@ -639,10 +631,10 @@ class Template extends EventEmitter {
               },
               timeout: 2 * 1000, // spray-wrtc timeout before definitively close a WebRTC connection.
               pendingTimeout: 5 * 1000, // time before the connection timeout in neighborhood-wrtc
-              delta: 5 * 1000, // spray-wrtc shuffle interval
-              maxPeers: 1000,
+              delta: 1 * 1000, // spray-wrtc shuffle interval
+              maxPeers: 100,
               a: 1, // for spray: a*ln(N) + b, inject a arcs
-              b: 0, // for spray: a*ln(N) + b, inject b arcs
+              b: 2, // for spray: a*ln(N) + b, inject b arcs
               signaling: {
                 address: "https://signaling.herokuapp.com/",
                 // signalingAdress: 'https://signaling.herokuapp.com/', // address of the signaling server
@@ -650,6 +642,7 @@ class Template extends EventEmitter {
               }
             }
           },
+          overlays: [],
           ssh: undefined /* {
           address: 'http://localhost:4000/'
         } */
@@ -704,13 +697,19 @@ class Template extends EventEmitter {
     });
   }
 
-  connection(template = undefined, overlay = undefined) {
+  /*connection(template = undefined, overlay = undefined) {
     if (!overlay && !!template) return this.foglet.connection(template.foglet);
     if (overlay) {
       this.foglet.share();
       return this.foglet.connection(template, overlay);
     }
     return Promise.reject();
+  }*/
+
+  connection(template, overlay='tman') {
+    if (template) return this.foglet.connection(template.foglet, overlay);
+    this.foglet.share();
+    return this.foglet.connection(null, overlay);
   }
 
   sendUnicast(id, message) {
@@ -755,18 +754,6 @@ class Template extends EventEmitter {
     myDescriptor.y = descriptor.y;
     myDescriptor.z = descriptor.z;
     
-    // TOCHANGE
-    /*this.foglet
-      .overlay(overlay)
-      .network._rps.parent.getPeers()
-      .forEach(peerId => {
-        this.sendOverlayUnicast(
-          overlay,
-          peerId,
-          new MUpdatePartialView(this.foglet.inViewID, myDescriptor)
-        );
-      });*/
-
     this.emit("descriptor-updated", {
       id: this.foglet.inViewID,
       descriptor: myDescriptor
@@ -7593,10 +7580,10 @@ module.exports = Object.keys || function keys (obj){
 ;(function(root) {
 
 	// Detect free variables `exports`
-	var freeExports =  true && exports;
+	var freeExports = typeof exports == 'object' && exports;
 
 	// Detect free variable `module`
-	var freeModule =  true && module &&
+	var freeModule = typeof module == 'object' && module &&
 		module.exports == freeExports && module;
 
 	// Detect free variable `global`, from Node.js or Browserified code,
@@ -14540,6 +14527,7 @@ class Manager {
 
   connect (from, to) {
     debugManager('peer connected from/to: ', from, to)
+    console.log('from', from, 'to',to, this.manager)
     this.manager.get(to)._connectWith(from)
     this.manager.get(from)._connectWith(to)
   }
@@ -15114,7 +15102,7 @@ var freeSelf = typeof self == 'object' && self && self.Object === Object && self
 var root = freeGlobal || freeSelf || Function('return this')();
 
 /** Detect free variable `exports`. */
-var freeExports =  true && exports && !exports.nodeType && exports;
+var freeExports = typeof exports == 'object' && exports && !exports.nodeType && exports;
 
 /** Detect free variable `module`. */
 var freeModule = freeExports && typeof module == 'object' && module && !module.nodeType && module;
@@ -15757,7 +15745,7 @@ var freeSelf = typeof self == 'object' && self && self.Object === Object && self
 var root = freeGlobal || freeSelf || Function('return this')();
 
 /** Detect free variable `exports`. */
-var freeExports =  true && exports && !exports.nodeType && exports;
+var freeExports = typeof exports == 'object' && exports && !exports.nodeType && exports;
 
 /** Detect free variable `module`. */
 var freeModule = freeExports && typeof module == 'object' && module && !module.nodeType && module;
@@ -17747,7 +17735,7 @@ var freeSelf = typeof self == 'object' && self && self.Object === Object && self
 var root = freeGlobal || freeSelf || Function('return this')();
 
 /** Detect free variable `exports`. */
-var freeExports =  true && exports && !exports.nodeType && exports;
+var freeExports = typeof exports == 'object' && exports && !exports.nodeType && exports;
 
 /** Detect free variable `module`. */
 var freeModule = freeExports && typeof module == 'object' && module && !module.nodeType && module;
@@ -43488,7 +43476,7 @@ class TMan extends N2N {
         }
       }
       // #2 propose the sample to the chosen one
-      // console.log(chosen, sample)
+      // g(chosen, sample)
       chosen && this.unicast.emit('tman-exchange', chosen, this.getInviewId(), new MSuggest(this.getInviewId(),
         this.options.descriptor,
         sample))
