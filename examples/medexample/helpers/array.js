@@ -18,15 +18,15 @@ const forEachPromise = async (array, callback) => {
   return result;
 };
 
-
-
-const deepcopy = (object) => {
-  let result = null
+const deepcopy = object => {
+  let result = null;
   try {
-      result = JSON.parse(JSON.stringify(object))
-  } catch(e) {
-      console.log("Imposible to parse")
-      result = null
+    result = JSON.parse(JSON.stringify(object));
+  } catch (e) {
+    console.log("Imposible to parse");
+    result = null;
   }
-  return result
-}
+  return result;
+};
+
+const getRandom = (range = MAX_NODES) => Math.floor(Math.random() * range);

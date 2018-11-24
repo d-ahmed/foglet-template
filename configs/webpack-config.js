@@ -1,28 +1,28 @@
 module.exports = {
-  mode: 'development',
-  entry: './lib/main.js',
+  mode: "development",
+  entry: "./lib/index.js",
   output: {
-    'path': require('path').resolve(process.cwd(), 'bin'),
-    'filename': 'template.bundle.js',
-    'library': 'template',
-    'libraryTarget': 'umd',
-    'umdNamedDefine': true
+    path: require("path").resolve(process.cwd(), "bin"),
+    filename: "consensus.bundle.js",
+    library: "consensus",
+    libraryTarget: "umd",
+    umdNamedDefine: true
   },
   module: {
     rules: [
       {
         test: /\.js$/,
         exclude: () => {
-          return true
+          return true;
         },
         use: {
-          loader: 'babel-loader',
+          loader: "babel-loader",
           options: {
-            presets: [ 'env' ]
+            presets: ["env"]
           }
         }
       }
     ]
   },
-  devtool: 'source-map'
-}
+  devtool: "source-map"
+};
