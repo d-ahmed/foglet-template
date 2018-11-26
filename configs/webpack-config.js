@@ -2,7 +2,7 @@ module.exports = {
   mode: "development",
   entry: "./lib/index.js",
   output: {
-    path: require("path").resolve(process.cwd(), "bin"),
+    path: require("path").resolve(process.cwd(), "build"),
     filename: "consensus.bundle.js",
     library: "consensus",
     libraryTarget: "umd",

@@ -1,7 +1,3 @@
-console.error = function(){
-
-}
-
 const { template, target, Leader } = consensus; // eslint-disable-line
 // the bundle is included by default in the browser you do not have to require/import it
 localStorage.debug = ""; // 'template'
