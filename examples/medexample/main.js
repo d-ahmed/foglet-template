@@ -1,14 +1,14 @@
 const { template, target, Leader, paxos } = consensus; // eslint-disable-line
 // the bundle is included by default in the browser you do not have to require/import it
 localStorage.debug = ""; // 'template'
-const MAX_PEERS = 10;
+const MAX_PEERS = 3;
 
 // Create sigma graphs _________
 // const rps = createSigma("rps");
 const overlay = createSigma("overlay");
 
 // Creating peers and sigma nodes
-const MAX_NODES = 10;
+const MAX_NODES = 3;
 const peers = [];
 const paxoses = [];
 const delta = 2 * 1000;
