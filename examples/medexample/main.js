@@ -1,27 +1,27 @@
-const { template, target, Leader } = consensus; // eslint-disable-line
+const { template, target, Leader, paxos } = consensus; // eslint-disable-line
 // the bundle is included by default in the browser you do not have to require/import it
 localStorage.debug = ""; // 'template'
-const MAX_PEERS = 10;
+const MAX_PEERS = 3;
 
 // Create sigma graphs _________
 // const rps = createSigma("rps");
 const overlay = createSigma("overlay");
 
 // Creating peers and sigma nodes
-const MAX_NODES = 100;
+const MAX_NODES = 20;
 const peers = [];
-const leaders = [];
+const paxoses = [];
 const delta = 2 * 1000;
 
 for (let i = 0; i < MAX_NODES; i++) {
   const fogletTemplate = new template({ foglet: { id: i + "" } }, true);
   fogletTemplate.setDescriptor({
     id: i,
-    x: getRandom(), // i*2, // 
-    y: getRandom()// i%5, //
+    x: i * 2, // getRandom(), //
+    y: i % 5 // getRandom() //
   });
   peers.push(fogletTemplate);
-  leaders.push(new Leader(fogletTemplate))
+  paxoses.push(new paxos(fogletTemplate));
 
   // Add nodes *to graph
   // addTemplateToGraph(rps, fogletTemplate, {
@@ -61,26 +61,23 @@ Array.from(peers, (peer, index) => {
 });
 
 spawnTarget("1", {
-  coordinates: { x: getRandom(), y: getRandom() },
+  coordinates: { x: 3, y: 1 },
   perimeter: 20
 });
 spawnTarget("2", {
-  coordinates: { x: getRandom(), y: getRandom() },
-  perimeter: 20
+  coordinates: { x: 12, y: 1 },
+  perimeter: 7
 });
-spawnTarget("5", {
-  coordinates: { x: getRandom(), y: getRandom() },
-  perimeter: 30
-});
-// spawnTarget("4", { coordinates: { x: 37, y: 3 }, perimeter: 4 });
 
-// spawnTarget("c", {
+// spawnTarget("1", {
+//   coordinates: { x: getRandom(), y: getRandom() },
+//   perimeter: 6
+// });
+// spawnTarget("2", {
+//   coordinates: { x: getRandom(), y: getRandom() },
+//   perimeter: 7
+// });
+// spawnTarget("5", {
 //   coordinates: { x: getRandom(), y: getRandom() },
 //   perimeter: 5
 // });
-
-// setInterval(() => {
-//   refresh();
-// }, 2 * 1000);
-
-// doConvergence();
