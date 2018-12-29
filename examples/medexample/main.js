@@ -8,7 +8,7 @@ const MAX_PEERS = 3;
 const overlay = createSigma("overlay");
 
 // Creating peers and sigma nodes
-const MAX_NODES = 3;
+const MAX_NODES = 20;
 const peers = [];
 const paxoses = [];
 const delta = 2 * 1000;
@@ -62,12 +62,12 @@ Array.from(peers, (peer, index) => {
 
 spawnTarget("1", {
   coordinates: { x: 3, y: 1 },
-  perimeter: 6
+  perimeter: 20
 });
-// spawnTarget("2", {
-//   coordinates: { x: 24, y: 1 },
-//   perimeter: 7
-// });
+spawnTarget("2", {
+  coordinates: { x: 12, y: 1 },
+  perimeter: 7
+});
 
 // spawnTarget("1", {
 //   coordinates: { x: getRandom(), y: getRandom() },
