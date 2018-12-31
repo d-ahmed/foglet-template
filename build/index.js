@@ -404,12 +404,15 @@ class Paxos extends EventEmitter{
 
     if (!this.isMajorityValue(bstring, value)) return;
 
-    // this.progression.decided = value;
+    if(this.periodicDecision) clearInterval(this.periodicDecision);
 
     // Normalement setInterval, mais pour tester je fais qu'une seule fois
     const answer = new Message(Message.types().DECIDE, { value });
-    this.candidate.template.sendOverlayUnicastAll(this.overlay, answer);
-    this.decided(this.candidate.template.foglet.inViewID, answer);
+    this.periodicDecision = setInterval(()=>{
+      console.log('Send decide')
+      this.candidate.template.sendOverlayUnicastAll(this.overlay, answer);
+      this.decided(this.candidate.template.foglet.inViewID, answer);
+    }, 1000)
   }
 
   decided(id, message) {
