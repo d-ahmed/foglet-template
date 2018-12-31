@@ -404,11 +404,7 @@ class Paxos extends EventEmitter{
 
     if (!this.isMajorityValue(bstring, value)) return;
 
-    this.progression.decided = value;
-    if (this.candidate.isLeader(this.overlay) && this.progression.decided){
-      this.emit('DECIDED', value);
-      clearInterval(this.periodic);
-    };
+    // this.progression.decided = value;
 
     // Normalement setInterval, mais pour tester je fais qu'une seule fois
     const answer = new Message(Message.types().DECIDE, { value });
@@ -494,6 +490,7 @@ class Main {
     // Launch paxos for all current overlays
     template.getOverlays().forEach(overlay => {
       this.current[overlay] = new Paxos(template, overlay);
+      template.handleUnicast(overlay);
     });
 
     // Launch paxos for incoming overlays
