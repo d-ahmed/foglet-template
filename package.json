@@ -32,7 +32,7 @@
     "foglet-core": "^5.1.1",
     "lodash.merge": "^4.6.1",
     "sigma": "^1.2.1",
-    "tman-wrtc": "git+https://github.com/ran3d/tman-wrtc.git",
+    "tman-wrtc": "git+https://github.com/nachmo5/tman-wrtc.git",
     "uuid": "^3.3.2"
   },
   "devDependencies": {
