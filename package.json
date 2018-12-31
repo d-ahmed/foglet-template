@@ -1,6 +1,6 @@
 {
   "name": "foglet-template",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Template using foglet-core module",
   "main": "./lib/index.js",
   "scripts": {
