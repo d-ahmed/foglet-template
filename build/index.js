@@ -281,12 +281,14 @@ class Paxos extends EventEmitter{
       this.progression.ballot,
       this.candidate.template.foglet.inViewID
     );
+    this.sendPrepare()
     this.periodic = setInterval(() => {
-      /*if (!this.candidate.isLeader(this.overlay) && this.progression.initialValue){
-        this.start();
-        this.progression.initialValue = null;
-      }*/
-      if (!this.candidate.isLeader(this.overlay)) return;
+      this.sendPrepare()
+    }, DELTA);
+  }
+
+  sendPrepare(){
+    if (!this.candidate.isLeader(this.overlay)) return;
       this.progression.proposed = [];
       this.progression.maxPeers =
         this.candidate.template.neighboursOverlay(this.overlay).length + 1;
@@ -298,7 +300,6 @@ class Paxos extends EventEmitter{
       });
       this.candidate.template.sendOverlayUnicastAll(this.overlay, message);
       this.acknowledge(this.candidate.template.foglet.inViewID, message);
-    }, DELTA);
   }
 
   /**
@@ -40164,17 +40165,41 @@ class TMan extends N2N {
     })
     // #6 if has parent, register events to get descriptors
     this.parent = parent || null
+ //   setInterval(()=>  {
+ //     this.getPeers().forEach(peerId => {
+ //       !this.cache.has(peerId) &&
+ //       this.unicast.emit('requestDescriptor',
+ //         peerId, this.getOutviewId())
+ //         .catch((e) => {
+ //            console.error(e)
+ //         })
+ //     })
+ //           }, 500)
+
     if (this.parent) {
       this.unicast = new U(this.parent,
-        {pid: 'tman-wrtc-unicast',
+        {
+          pid: 'tman-wrtc-unicast'+this.options.pid,
           retry: this.options.retry})
 
-      this.parent.on('open', (peerId) => !this.cache.has(peerId) &&
+      this.parent.on('open', (peerId) => {
+        !this.cache.has(peerId) &&
         this.unicast.emit('requestDescriptor',
           peerId, this.getOutviewId())
           .catch((e) => {
-            console.error(e)
-          }))
+           //  console.error(e)
+          })
+      })
+//       setInterval(()=>  {
+// this.parent.getPeers().forEach(peerId => {
+//   !this.cache.has(peerId) &&
+//   this.unicast.emit('requestDescriptor',
+//     peerId, this.getOutviewId())
+//     .catch((e) => {
+//        console.error(e)
+//     })
+// })
+//       }, 500)
       this.unicast.on('tman-exchange', (id, message) => this._receive(id, message))
       this.unicast.on('requestDescriptor', (requester) => this.unicast.emit('giveDescriptor', requester,
         this.getInviewId(),
@@ -40396,7 +40421,7 @@ class TMan extends N2N {
         }
       }
       // #2 propose the sample to the chosen one
-      console.log(chosen, sample)
+      // console.log(chosen, sample)
       chosen && this.unicast.emit('tman-exchange', chosen, this.getInviewId(), new MSuggest(this.getInviewId(),
         this.options.descriptor,
         sample))
@@ -40433,6 +40458,7 @@ class TMan extends N2N {
     // #2 analyze the received sample and keep the elements if they are
     // better than the current ones
     this._onExchangeBack(peerId, message)
+
   }
 
   /**
@@ -40441,7 +40467,6 @@ class TMan extends N2N {
      * @param {MSuggest|MSuggestBack} message The message received.
      */
   _onExchangeBack (peerId, message) {
-    console.log(peerId, message)
     // #1 keep the best elements from the received sample
     let ranked = []
     // -- begin hot fix, remove duplicates
@@ -40452,7 +40477,13 @@ class TMan extends N2N {
     this.partialView.forEach((epv, neighbor) => {
       if (!a.has(neighbor)) a.set(neighbor, epv)
     })
+    this.parent && this.parent.partialView.forEach((epv, neighbor) => {
+      if(this.cache.has(neighbor)){
+        if (!a.has(neighbor)) a.set(neighbor, this.cache.get(neighbor))
+      }
+    })
     ranked = [...a.values()]
+    
     // -- end hot fix
 
     ranked.sort(this.options.ranking(this.options))
