@@ -410,7 +410,6 @@ class Paxos extends EventEmitter{
     // Normalement setInterval, mais pour tester je fais qu'une seule fois
     const answer = new Message(Message.types().DECIDE, { value });
     this.periodicDecision = setInterval(()=>{
-      console.log('Send decide')
       this.candidate.template.sendOverlayUnicastAll(this.overlay, answer);
       this.decided(this.candidate.template.foglet.inViewID, answer);
     }, 1000)
