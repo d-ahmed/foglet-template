@@ -556,14 +556,12 @@ class Leader {
    * @param {*} [template=null]
    * @memberof Leader
    */
-  constructor(template = null, delta = 10 * 1000) {
+  constructor(template = null, delta = 1 * 1000) {
     this.template = template;
 
     this.leaderOfCible = new Map();
 
-    let period = setInterval(() => {
-      this.doLeaderElection();
-    }, delta);
+    
 
     this.ranking = (neighbor, callkack) => (a, b) => {
       const getDistance = (descriptor1, descriptor2) => {
@@ -587,6 +585,11 @@ class Leader {
       // console.log('neighbor ', neighbor, ' a ', a, ' b ', b)
       return distanceA - distanceB;
     };
+
+    this.doLeaderElection();
+    let period = setInterval(() => {
+      this.doLeaderElection();
+    }, delta);
   }
 
   /**
